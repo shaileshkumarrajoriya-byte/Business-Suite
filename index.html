@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Business Suite">
+<link rel="manifest" href="manifest-suite-v3.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Business Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #141414;
+    --ink-dark: #000000;
+    --paper: #FBF9F4;
+    --paper-line: #E7E1D3;
+    --brass: #C9A227;
+    --brass-deep: #8A6B14;
+    --brass-light: #F0D488;
+    --paid: #3F7859;
+    --due: #B23B31;
+    --text: #2B2E33;
+    --muted: #6B7280;
+  }
+  *{box-sizing:border-box;}
+  html, body{ height:100%; }
+  body{
+    margin:0; background: var(--paper); color: var(--text);
+    font-family:'Inter', sans-serif;
+    overflow:hidden;
+  }
+
+  header{
+    background: linear-gradient(160deg, #1c1c1c 0%, #0a0a0a 70%);
+    color:#fff; padding: 14px 16px; text-align:center;
+    border-bottom: 3px solid var(--brass);
+    position:fixed; top:0; left:0; right:0; z-index:20;
+    transition: transform 0.3s ease;
+  }
+  header.bars-hidden{ transform: translateY(-100%); }
+  header h1{
+    font-family:'Bitter',serif; font-weight:800; font-size:1.15rem; margin:0;
+    background: linear-gradient(180deg, #fff 0%, #E8D9B5 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  header .tab-title{ font-size:1rem; font-weight:700; color:#F0E4C4; margin-top:6px; }
+  #logoutTopBtn{
+    position:absolute; top:12px; right:14px;
+    background:rgba(255,255,255,0.15); border:none; color:#fff;
+    width:32px; height:32px; border-radius:50%; font-size:0.95rem; cursor:pointer;
+  }
+
+  /* Invisible hot zones at the very top/bottom edge so hidden bars can
+     always be brought back with a tap, even mid-scroll inside an iframe. */
+  .edge-hotzone{ position:fixed; left:0; right:0; height:14px; z-index:19; }
+  #edgeTop{ top:0; }
+  #edgeBottom{ bottom:0; }
+
+  .frame-wrap{
+    position:fixed; left:0; right:0;
+    top: var(--header-h, 92px);
+    bottom: var(--nav-h, 64px);
+    overflow:hidden;
+    transition: top 0.3s ease, bottom 0.3s ease;
+  }
+  .frame-wrap.bars-hidden{ top:0; bottom:0; }
+  .frame-wrap iframe{
+    position:absolute; inset:0; width:100%; height:100%; border:none;
+    background: var(--paper);
+  }
+  .frame-wrap iframe.hidden{ display:none; }
+
+  .placeholder{
+    position:absolute; inset:0; display:none;
+    flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:30px; background:var(--paper);
+  }
+  .placeholder.show{ display:flex; }
+  .placeholder .icon{ font-size:3rem; margin-bottom:14px; }
+  .placeholder h3{ font-family:'Bitter',serif; color:var(--ink-dark); margin:0 0 6px; }
+  .placeholder p{ color:var(--muted); font-size:0.88rem; max-width:280px; }
+
+  .bottom-nav{
+    position:fixed; left:0; right:0; bottom:0; z-index:20;
+    background:#fff; border-top:1px solid var(--paper-line);
+    display:flex; flex-direction:column;
+    box-shadow: 0 -6px 18px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+  }
+  .bottom-nav.bars-hidden{ transform: translateY(100%); }
+  .nav-items-row{
+    display:flex; justify-content:space-around; align-items:center;
+    padding: 9px 0 4px;
+  }
+  .firm-info-strip{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    text-align:left; font-size:0.66rem; color:var(--muted);
+    padding: 6px 10px calc(7px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--paper-line);
+    line-height:1.5;
+  }
+  .firm-info-strip img{ height:28px; width:auto; flex-shrink:0; }
+  .firm-info-strip .firm-name{ font-weight:700; color:var(--ink-dark); font-family:'Bitter',serif; font-size:0.78rem; }
+  .bottom-nav-item{
+    position:relative;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    background:none; border:none; color:var(--muted); cursor:pointer;
+    font-size:0.64rem; font-weight:600; padding:4px 8px;
+  }
+  .bottom-nav-item .nav-icon{ font-size:1.22rem; }
+  .bottom-nav-item.active{ color: var(--brass-deep); }
+  .bottom-nav-item.active::before{
+    content:''; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+    width:20px; height:3px; border-radius:2px;
+    background: linear-gradient(90deg, var(--brass-deep), var(--brass));
+
+  }
+
+  /* ============ Login gate ============ */
+  #loginScreen{
+    position:fixed; inset:0; z-index:100;
+    background: linear-gradient(160deg, #1c1c1c 0%, #0a0a0a 70%);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  #loginScreen.hidden{ display:none; }
+  .login-card{
+    background:#fff; border-radius:20px; padding:30px 26px;
+    max-width:360px; width:100%; box-shadow: 0 20px 50px rgba(0,0,0,0.4); text-align:center;
+  }
+  .login-card img{ height:70px; margin-bottom:12px; }
+  .login-card h2{ font-family:'Bitter',serif; font-weight:800; font-size:1.3rem; color:var(--ink-dark); margin:0 0 4px; }
+  .login-card p{ color:var(--muted); font-size:0.82rem; margin:0 0 18px; }
+  .login-card .field{ text-align:left; margin-bottom:12px; }
+  .login-card label{ display:block; font-size:0.78rem; color:var(--muted); margin-bottom:4px; }
+  .login-card input{
+    width:100%; padding:10px 12px; border:1px solid var(--paper-line); border-radius:10px;
+    font-size:0.95rem; font-family:inherit;
+  }
+  .login-error{ color:var(--due); font-size:0.8rem; font-weight:600; margin:-4px 0 10px; display:none; }
+  .field{ text-align:left; margin-bottom:12px; }
+  label{ display:block; font-size:0.78rem; color:var(--muted); margin-bottom:4px; }
+  input{
+    width:100%; padding:10px 12px; border:1px solid var(--paper-line); border-radius:10px;
+    font-size:0.95rem; font-family:inherit; box-sizing:border-box;
+  }
+  .btn{
+    background: linear-gradient(160deg, var(--brass) 0%, var(--brass-deep) 100%);
+    color:#fff; border:none; border-radius:10px; padding:11px 16px;
+    font-weight:600; font-size:0.9rem; cursor:pointer; width:100%;
+  }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-card">
+    <img src="logo-header.png" alt="Logo">
+    <h2>Business Suite</h2>
+    <p>Please log in to continue</p>
+    <div class="field"><label>Username</label><input type="text" id="loginUser" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input type="password" id="loginPass" autocomplete="current-password"></div>
+    <div class="login-error" id="loginError">Wrong username or password</div>
+    <button class="btn" id="loginBtn" type="button">Log In</button>
+  </div>
+</div>
+
+<header>
+  <img src="shree-logo-transparent.png" alt="Shree" style="position:absolute; top:28px; left:8px; height:30px; width:auto;">
+  <img src="shree-logo-transparent.png" alt="Shree" style="position:absolute; top:28px; right:8px; height:30px; width:auto;">
+  <button id="settingsTopBtn" aria-label="Settings" style="position:absolute; top:8px; left:46px; background:rgba(255,255,255,0.15); border:none; color:#fff; width:30px; height:30px; border-radius:50%; font-size:0.9rem; cursor:pointer;">⚙️</button>
+  <button id="logoutTopBtn" aria-label="Log out" style="position:absolute; top:8px; right:46px; background:rgba(255,255,255,0.15); border:none; color:#fff; width:30px; height:30px; border-radius:50%; font-size:0.9rem; cursor:pointer;">🚪</button>
+  <img src="ganesh-namah-logo.png" alt="Shree Ganeshaye Namah" style="height:84px;width:auto;margin-top:6px;">
+  <div class="tab-title" id="tabTitle">Home</div>
+</header>
+
+<div class="frame-wrap">
+  <iframe id="frame-home" data-src="https://shaileshkumarrajoriya-byte.github.io/profit_dashboard/" class="hidden"></iframe>
+  <iframe id="frame-students" data-src="https://shaileshkumarrajoriya-byte.github.io/Van-Register/" class="hidden"></iframe>
+  <iframe id="frame-drivers" data-src="https://shaileshkumarrajoriya-byte.github.io/Driver-Manager/" class="hidden"></iframe>
+  <iframe id="frame-expenses" data-src="https://shaileshkumarrajoriya-byte.github.io/Vehicle-Expenses/" class="hidden"></iframe>
+  <iframe id="frame-loans" data-src="https://shaileshkumarrajoriya-byte.github.io/Loan-Tracker/" class="hidden"></iframe>
+</div>
+
+<div class="bottom-nav" id="bottomNav">
+  <div class="nav-items-row">
+    <button class="bottom-nav-item active" data-tab="home"><span class="nav-icon">🏠</span>Home</button>
+    <button class="bottom-nav-item" data-tab="students"><span class="nav-icon">🧑‍🎓</span>Students</button>
+    <button class="bottom-nav-item" data-tab="drivers"><span class="nav-icon">🧑‍✈️</span>Drivers</button>
+    <button class="bottom-nav-item" data-tab="expenses"><span class="nav-icon">🚐</span>Expenses</button>
+    <button class="bottom-nav-item" data-tab="loans"><span class="nav-icon">💰</span>Loans</button>
+  </div>
+  <div class="firm-info-strip" id="firmInfoStrip">
+    <img id="firmLogo" src="logo-header.png" alt="" style="display:none;">
+    <div id="firmInfoText">Loading firm details…</div>
+  </div>
+</div>
+
+<div id="settingsModalBg" style="position:fixed; inset:0; background:rgba(20,20,20,0.5); display:none; align-items:center; justify-content:center; z-index:90; padding:20px;">
+  <div style="background:#fff; border-radius:18px; padding:24px; max-width:360px; width:100%;">
+    <h3 style="font-family:'Bitter',serif; margin-top:0; color:var(--ink-dark);">Login & Security</h3>
+    <div class="field"><label>Change Username</label><input type="text" id="newUsername" placeholder="Leave blank to keep current"></div>
+    <div class="field"><label>Current Password</label><input type="password" id="currentPassword" autocomplete="current-password"></div>
+    <div class="field"><label>New Password</label><input type="password" id="newPassword" placeholder="Leave blank to keep current" autocomplete="new-password"></div>
+    <div class="login-error" id="passwordChangeError">Current password is incorrect</div>
+    <button class="btn" id="changeCredentialsBtn" type="button" style="margin-bottom:10px;">Update Username / Password</button>
+    <button class="btn" id="closeSettingsBtn" type="button" style="background:#fff; color:var(--muted); border:1px solid var(--paper-line);">Close</button>
+  </div>
+</div>
+
+<script>
+// ---------- Login gate ----------
+// Shared lock for the whole suite. Same caveat as before: this is a
+// client-side lock (keeps casual visitors out), not server-side security.
+const AUTH_KEY = 'suiteAuthCreds';
+const AUTH_SESSION_KEY = 'suiteAuthLoggedIn';
+
+function getAuthCreds(){
+  let creds = null;
+  try{ creds = JSON.parse(localStorage.getItem(AUTH_KEY)); }catch(e){}
+  if(!creds || !creds.username || !creds.password){
+    creds = { username: 'admin', password: 'admin123' };
+    localStorage.setItem(AUTH_KEY, JSON.stringify(creds));
+  }
+  return creds;
+}
+function isLoggedIn(){ return localStorage.getItem(AUTH_SESSION_KEY) === 'true'; }
+function showLoginScreen(){ document.getElementById('loginScreen').classList.remove('hidden'); }
+function hideLoginScreen(){ document.getElementById('loginScreen').classList.add('hidden'); }
+
+document.getElementById('loginBtn').addEventListener('click', ()=>{
+  const creds = getAuthCreds();
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if(u === creds.username && p === creds.password){
+    localStorage.setItem(AUTH_SESSION_KEY, 'true');
+    document.getElementById('loginError').style.display = 'none';
+    hideLoginScreen();
+    activateTab('home'); // lazy-load the first tab now that we're in
+    syncFrameOffsets();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+});
+document.getElementById('loginPass').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+document.getElementById('logoutTopBtn').addEventListener('click', ()=>{
+  if(confirm('Log out of Business Suite?')){
+    localStorage.removeItem(AUTH_SESSION_KEY);
+    showLoginScreen();
+  }
+});
+
+document.getElementById('settingsTopBtn').addEventListener('click', ()=>{
+  document.getElementById('settingsModalBg').style.display = 'flex';
+});
+document.getElementById('closeSettingsBtn').addEventListener('click', ()=>{
+  document.getElementById('settingsModalBg').style.display = 'none';
+  document.getElementById('passwordChangeError').style.display = 'none';
+  document.getElementById('newUsername').value = '';
+  document.getElementById('currentPassword').value = '';
+  document.getElementById('newPassword').value = '';
+});
+document.getElementById('changeCredentialsBtn').addEventListener('click', ()=>{
+  const creds = getAuthCreds();
+  const curPass = document.getElementById('currentPassword').value;
+  const newUser = document.getElementById('newUsername').value.trim();
+  const newPass = document.getElementById('newPassword').value;
+  const errEl = document.getElementById('passwordChangeError');
+  if(curPass !== creds.password){
+    errEl.textContent = 'Current password is incorrect';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  localStorage.setItem(AUTH_KEY, JSON.stringify({
+    username: newUser || creds.username,
+    password: newPass || creds.password
+  }));
+  document.getElementById('newUsername').value = '';
+  document.getElementById('currentPassword').value = '';
+  document.getElementById('newPassword').value = '';
+  alert('✓ Login details updated');
+  document.getElementById('settingsModalBg').style.display = 'none';
+});
+
+getAuthCreds();
+if(isLoggedIn()){ hideLoginScreen(); } else { showLoginScreen(); }
+
+// ---------- Tab switching (with lazy iframe loading) ----------
+const TAB_LABELS = { home:'Home', students:'Students', drivers:'Drivers', expenses:'Expenses', loans:'Loans' };
+const loadedFrames = {};
+
+function activateTab(tab){
+  document.querySelectorAll('.bottom-nav-item').forEach(b=>b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('tabTitle').textContent = TAB_LABELS[tab] || '';
+
+  document.querySelectorAll('.frame-wrap iframe').forEach(f=>f.classList.add('hidden'));
+  document.querySelectorAll('.placeholder').forEach(p=>p.classList.remove('show'));
+
+  const frame = document.getElementById('frame-' + tab);
+  if(frame){
+    if(!loadedFrames[tab]){
+      frame.src = frame.dataset.src;
+      loadedFrames[tab] = true;
+    }
+    frame.classList.remove('hidden');
+  } else {
+    const ph = document.getElementById('placeholder-' + tab);
+    if(ph) ph.classList.add('show');
+  }
+}
+
+document.getElementById('bottomNav').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.bottom-nav-item');
+  if(!btn) return;
+  activateTab(btn.dataset.tab);
+});
+
+if(isLoggedIn()){ activateTab('home'); syncFrameOffsets(); }
+
+// ---------- Keep frame offsets correct (header/bottom-nav always visible) ----------
+function syncFrameOffsets(){
+  const headerH = document.querySelector('header').offsetHeight;
+  const navH = document.getElementById('bottomNav').offsetHeight;
+  document.documentElement.style.setProperty('--header-h', headerH + 'px');
+  document.documentElement.style.setProperty('--nav-h', navH + 'px');
+}
+window.addEventListener('resize', syncFrameOffsets);
+
+// ---------- Firm info footer (pulled once from Van Register's data) ----------
+async function loadFirmInfo(){
+  const textEl = document.getElementById('firmInfoText');
+  const logoEl = document.getElementById('firmLogo');
+  try{
+    const res = await fetch('https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app/data.json');
+    const data = await res.json();
+    const parsed = data && data.value ? JSON.parse(data.value) : null;
+    const biz = parsed && parsed.business;
+    if(!biz || !biz.name){ textEl.textContent = ''; syncFrameOffsets(); return; }
+    const parts = [];
+    if(biz.regNo) parts.push('Reg No: ' + biz.regNo);
+    if(biz.gst) parts.push('GSTIN: ' + biz.gst);
+    if(biz.phone) parts.push('☎ ' + biz.phone);
+    textEl.innerHTML = `<span class="firm-name">${biz.name}</span>` + (parts.length ? '<br>' + parts.join(' · ') : '');
+    logoEl.style.display = 'block';
+  }catch(e){
+    textEl.textContent = '';
+  }
+  syncFrameOffsets();
+}
+loadFirmInfo();
+</script>
+</body>
+</html>
