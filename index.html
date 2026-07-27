@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Business Suite">
+<link rel="manifest" href="manifest-suite-v3.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Business Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #141414;
+    --ink-dark: #000000;
+    --paper: #FBF9F4;
+    --paper-line: #E7E1D3;
+    --brass: #C9A227;
+    --brass-deep: #8A6B14;
+    --brass-light: #F0D488;
+    --paid: #3F7859;
+    --due: #B23B31;
+    --text: #2B2E33;
+    --muted: #6B7280;
+  }
+  *{box-sizing:border-box;}
+  html, body{ height:100%; }
+  body{
+    margin:0; background: var(--paper); color: var(--text);
+    font-family:'Inter', sans-serif;
+    overflow:hidden;
+  }
+
+  header{
+    background: linear-gradient(160deg, #1c1c1c 0%, #0a0a0a 70%);
+    color:#fff; padding: 14px 16px; text-align:center;
+    border-bottom: 3px solid var(--brass);
+    border-top: 2px solid var(--brass);
+    position:fixed; top:0; left:0; right:0; z-index:20;
+    transition: transform 0.3s ease;
+  }
+  header::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background: repeating-linear-gradient(90deg, var(--brass-light) 0px, var(--brass-light) 6px, transparent 6px, transparent 12px);
+    opacity:0.8;
+  }
+  header.bars-hidden{ transform: translateY(-100%); }
+  header h1{
+    font-family:'Bitter',serif; font-weight:800; font-size:1.15rem; margin:0;
+    background: linear-gradient(180deg, #fff 0%, #E8D9B5 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  header .tab-title{ font-size:1rem; font-weight:700; color:#F0E4C4; margin-top:6px; }
+  .logo-glow{
+    position:relative; display:inline-flex; align-items:center; justify-content:center;
+  }
+  .logo-glow::before{
+    content:''; position:absolute; inset:-14px;
+    background: radial-gradient(ellipse at center, rgba(240,212,136,0.55) 0%, rgba(240,212,136,0.18) 45%, transparent 75%);
+    border-radius:50%;
+    animation: glowPulse 2.8s ease-in-out infinite;
+    z-index:0;
+  }
+  .logo-glow img{ position:relative; z-index:1; }
+  @keyframes glowPulse{
+    0%, 100%{ opacity:0.6; transform:scale(0.96); }
+    50%{ opacity:1; transform:scale(1.06); }
+  }
+  .diya{ font-size:1.3rem; position:relative; z-index:1; filter: drop-shadow(0 0 4px rgba(255,180,60,0.7)); }
+  #logoutTopBtn{
+    position:absolute; top:12px; right:14px;
+    background:rgba(255,255,255,0.15); border:none; color:#fff;
+    width:32px; height:32px; border-radius:50%; font-size:0.95rem; cursor:pointer;
+  }
+
+  /* Invisible hot zones at the very top/bottom edge so hidden bars can
+     always be brought back with a tap, even mid-scroll inside an iframe. */
+  .edge-hotzone{ position:fixed; left:0; right:0; height:14px; z-index:19; }
+  #edgeTop{ top:0; }
+  #edgeBottom{ bottom:0; }
+
+  .frame-wrap{
+    position:fixed; left:0; right:0;
+    top: var(--header-h, 92px);
+    bottom: var(--nav-h, 64px);
+    overflow:hidden;
+    transition: top 0.3s ease, bottom 0.3s ease;
+  }
+  .frame-wrap.bars-hidden{ top:0; bottom:0; }
+  .frame-wrap iframe{
+    position:absolute; inset:0; width:100%; height:100%; border:none;
+    background: var(--paper);
+  }
+  .frame-wrap iframe.hidden{ display:none; }
+
+  .placeholder{
+    position:absolute; inset:0; display:none;
+    flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:30px; background:var(--paper);
+  }
+  .placeholder.show{ display:flex; }
+  .placeholder .icon{ font-size:3rem; margin-bottom:14px; }
+  .placeholder h3{ font-family:'Bitter',serif; color:var(--ink-dark); margin:0 0 6px; }
+  .placeholder p{ color:var(--muted); font-size:0.88rem; max-width:280px; }
+
+  .bottom-nav{
+    position:fixed; left:0; right:0; bottom:0; z-index:20;
+    background:#fff; border-top:1px solid var(--paper-line);
+    display:flex; flex-direction:column;
+    box-shadow: 0 -6px 18px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+  }
+  .bottom-nav.bars-hidden{ transform: translateY(100%); }
+  .nav-items-row{
+    display:flex; justify-content:space-around; align-items:center;
+    padding: 9px 0 4px;
+  }
+  .firm-info-strip{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    text-align:left; font-size:0.66rem; color:var(--muted);
+    padding: 6px 10px calc(7px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--paper-line);
+    line-height:1.5;
+  }
+  .firm-info-strip img{ height:28px; width:auto; flex-shrink:0; }
+  .firm-info-strip .firm-name{ font-weight:700; color:var(--ink-dark); font-family:'Bitter',serif; font-size:0.78rem; }
+  .bottom-nav-item{
+    position:relative;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    background:none; border:none; color:var(--muted); cursor:pointer;
+    font-size:0.64rem; font-weight:600; padding:4px 8px;
+  }
+  .bottom-nav-item .nav-icon{ font-size:1.22rem; }
+  .bottom-nav-item.active{ color: var(--brass-deep); }
+  .bottom-nav-item.active::before{
+    content:''; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+    width:20px; height:3px; border-radius:2px;
+    background: linear-gradient(90deg, var(--brass-deep), var(--brass));
+
+  }
+
+  /* ============ Login gate ============ */
+  #loginScreen{
+    position:fixed; inset:0; z-index:100;
+    background: linear-gradient(160deg, #1c1c1c 0%, #0a0a0a 70%);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  #loginScreen.hidden{ display:none; }
+  .login-card{
+    background:#fff; border-radius:20px; padding:30px 26px;
+    max-width:360px; width:100%; box-shadow: 0 20px 50px rgba(0,0,0,0.4); text-align:center;
+  }
+  .login-card img{ height:70px; margin-bottom:12px; }
+  .login-card h2{ font-family:'Bitter',serif; font-weight:800; font-size:1.3rem; color:var(--ink-dark); margin:0 0 4px; }
+  .login-card p{ color:var(--muted); font-size:0.82rem; margin:0 0 18px; }
+  .login-card .field{ text-align:left; margin-bottom:12px; }
+  .login-card label{ display:block; font-size:0.78rem; color:var(--muted); margin-bottom:4px; }
+  .login-card input{
+    width:100%; padding:10px 12px; border:1px solid var(--paper-line); border-radius:10px;
+    font-size:0.95rem; font-family:inherit;
+  }
+  .login-error{ color:var(--due); font-size:0.8rem; font-weight:600; margin:-4px 0 10px; display:none; }
+
+  /* ============ New home/login screen ============ */
+  #loginScreen{
+    background: linear-gradient(180deg, #E9DCC3 0%, #D8C9A8 35%, #EFE6D2 100%);
+    display:block; overflow-y:auto; padding:0;
+  }
+  .ls-menu-btn{
+    position:fixed; top:14px; left:14px; z-index:5;
+    background:rgba(0,0,0,0.25); border:none; color:#3a2f1c;
+    width:36px; height:36px; border-radius:8px; font-size:1.2rem; cursor:pointer;
+  }
+  .ls-hero{
+    position:relative; padding:34px 20px 18px; text-align:center;
+    background: radial-gradient(ellipse at top, rgba(255,255,255,0.5), transparent 70%);
+  }
+  .ls-hero img.ls-logo{
+    height:120px; width:120px; object-fit:cover; border-radius:50%;
+    border:3px solid #C9A227; box-shadow:0 6px 20px rgba(0,0,0,0.25);
+  }
+  .ls-firm-name{
+    font-family:'Bitter',serif; font-weight:800; font-size:1.3rem;
+    color:#2A2114; margin:14px 0 2px;
+  }
+  .ls-firm-sub{
+    font-family:'Bitter',serif; font-weight:700; font-size:0.95rem;
+    color:#5c4a2a; letter-spacing:0.5px; margin:0;
+  }
+  .ls-divider{ text-align:center; color:#8a7247; font-size:0.8rem; margin:14px 0; letter-spacing:2px; }
+
+  .ls-card{
+    background: rgba(255,252,244,0.92);
+    margin:0 18px; border-radius:16px; padding:20px;
+    box-shadow: 0 10px 30px rgba(60,45,15,0.18);
+    border:1px solid rgba(201,162,39,0.35);
+  }
+  .ls-card h3{
+    text-align:center; font-family:'Bitter',serif; font-weight:800;
+    letter-spacing:3px; color:#2A2114; margin:0 0 16px; font-size:1rem;
+  }
+  .ls-input-wrap{
+    display:flex; align-items:center; gap:10px;
+    background:#fff; border:1px solid #D9C89A; border-radius:10px;
+    padding:12px 14px; margin-bottom:12px;
+  }
+  .ls-input-wrap span{ color:#8a7247; font-size:1rem; flex-shrink:0; }
+  .ls-input-wrap input{
+    border:none; outline:none; flex:1; font-size:0.95rem; font-family:inherit; background:transparent;
+    padding:0; width:auto;
+  }
+  .ls-input-wrap button{ background:none; border:none; color:#8a7247; cursor:pointer; font-size:1rem; }
+  .ls-row{ display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:#5c4a2a; margin-bottom:16px; }
+  .ls-row label{ display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .ls-login-btn{
+    width:100%; background: linear-gradient(160deg,#262626,#000);
+    color:#E8C766; border:none; border-radius:10px; padding:13px;
+    font-weight:700; font-size:1rem; letter-spacing:1px; cursor:pointer;
+  }
+
+  .ls-info-strip{
+    display:flex; margin:18px 18px 0; background:rgba(255,252,244,0.85);
+    border-radius:14px; overflow:hidden; border:1px solid rgba(201,162,39,0.3);
+  }
+  .ls-info-item{
+    flex:1; text-align:center; padding:14px 6px;
+    border-right:1px solid rgba(201,162,39,0.25);
+  }
+  .ls-info-item:last-child{ border-right:none; }
+  .ls-info-item .ic{
+    width:34px; height:34px; border-radius:50%; margin:0 auto 6px;
+    background:#2A2114; color:#E8C766; display:flex; align-items:center; justify-content:center; font-size:1rem;
+  }
+  .ls-info-item .lbl{ font-size:0.7rem; color:#8a7247; font-weight:700; }
+  .ls-info-item .val{ font-size:0.68rem; color:#3a2f1c; margin-top:2px; line-height:1.3; word-break:break-word; }
+
+  .ls-address{
+    margin:16px 18px 0; background:rgba(255,252,244,0.85);
+    border-radius:14px; padding:16px; border:1px solid rgba(201,162,39,0.3);
+  }
+  .ls-address .ah{
+    display:flex; align-items:center; gap:6px; font-weight:700; color:#2A2114;
+    font-size:0.85rem; letter-spacing:1px; margin-bottom:10px;
+  }
+  .ls-address-body{ display:flex; gap:12px; align-items:center; }
+  .ls-address-body .txt{ flex:1; font-size:0.78rem; color:#4a3d24; line-height:1.6; }
+  .ls-address-body img{ width:84px; height:60px; object-fit:cover; border-radius:8px; flex-shrink:0; }
+
+  .ls-footer{
+    margin-top:22px; background:#151109; color:#E8C766;
+    text-align:center; font-size:0.75rem; padding:12px 16px 22px;
+  }
+  .field{ text-align:left; margin-bottom:12px; }
+  label{ display:block; font-size:0.78rem; color:var(--muted); margin-bottom:4px; }
+  input{
+    width:100%; padding:10px 12px; border:1px solid var(--paper-line); border-radius:10px;
+    font-size:0.95rem; font-family:inherit; box-sizing:border-box;
+  }
+  .btn{
+    background: linear-gradient(160deg, var(--brass) 0%, var(--brass-deep) 100%);
+    color:#fff; border:none; border-radius:10px; padding:11px 16px;
+    font-weight:600; font-size:0.9rem; cursor:pointer; width:100%;
+  }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <button class="ls-menu-btn" aria-label="Menu">☰</button>
+
+  <div class="ls-hero">
+    <img class="ls-logo" src="narmda-logo.jpg" alt="Logo">
+    <div class="ls-firm-name" id="lsFirmName">SHREE MAA NARMADA</div>
+    <div class="ls-firm-sub" id="lsFirmSub">AUTOMOBILE'S &amp; TRAVELS</div>
+  </div>
+
+  <div class="ls-divider">◆ ◆ ◆ &nbsp; LOGIN &nbsp; ◆ ◆ ◆</div>
+
+  <div class="ls-card">
+    <div class="ls-input-wrap">
+      <span>👤</span>
+      <input type="text" id="loginUser" placeholder="User ID" autocomplete="username">
+    </div>
+    <div class="ls-input-wrap">
+      <span>🔒</span>
+      <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
+      <button type="button" id="togglePassBtn" aria-label="Show password">👁️</button>
+    </div>
+    <div class="login-error" id="loginError">Wrong username or password</div>
+    <div class="ls-row">
+      <label><input type="checkbox" id="rememberMeChk"> Remember Me</label>
+      <span id="forgotPassBtn" style="cursor:pointer;text-decoration:underline;">Forgot Password?</span>
+    </div>
+    <button class="ls-login-btn" id="loginBtn" type="button">LOGIN</button>
+  </div>
+
+  <div class="ls-info-strip">
+    <div class="ls-info-item">
+      <div class="ic">🧾</div>
+      <div class="lbl">Reg No.</div>
+      <div class="val" id="lsRegNo">—</div>
+    </div>
+    <div class="ls-info-item">
+      <div class="ic">💲</div>
+      <div class="lbl">GSTIN</div>
+      <div class="val" id="lsGst">—</div>
+    </div>
+    <div class="ls-info-item">
+      <div class="ic">📞</div>
+      <div class="lbl">Phone</div>
+      <div class="val" id="lsPhone">—</div>
+    </div>
+  </div>
+
+  <div class="ls-address">
+    <div class="ah">📍 ADDRESS</div>
+    <div class="ls-address-body">
+      <div class="txt" id="lsAddress">Shree Maa Narmada Automobiles &amp; Travels</div>
+      <img src="narmda-logo.jpg" alt="">
+    </div>
+  </div>
+
+  <div class="ls-footer" id="lsFooter">For Support Contact: —</div>
+</div>
+
+<header>
+  <img src="shree-logo-transparent.png" alt="Shree" style="position:absolute; top:28px; left:8px; height:30px; width:auto;">
+  <img src="shree-logo-transparent.png" alt="Shree" style="position:absolute; top:28px; right:8px; height:30px; width:auto;">
+  <button id="settingsTopBtn" aria-label="Settings" style="position:absolute; top:8px; left:46px; background:rgba(255,255,255,0.15); border:none; color:#fff; width:30px; height:30px; border-radius:50%; font-size:0.9rem; cursor:pointer;">⚙️</button>
+  <button id="logoutTopBtn" aria-label="Log out" style="position:absolute; top:8px; right:46px; background:rgba(255,255,255,0.15); border:none; color:#fff; width:30px; height:30px; border-radius:50%; font-size:0.9rem; cursor:pointer;">🚪</button>
+  <div class="logo-glow" style="gap:8px;margin-top:6px;">
+    <span class="diya">🪔</span>
+    <img src="ganesh-namah-logo.png" alt="Shree Ganeshaye Namah" style="height:84px;width:auto;">
+    <span class="diya" style="display:inline-block; transform: scaleX(-1);">🪔</span>
+  </div>
+  <div class="tab-title" id="tabTitle">Home</div>
+  <div id="liveTime" style="position:absolute; bottom:10px; left:14px; font-size:0.8rem; font-weight:600; color:#F0E4C4;"></div>
+  <div id="liveDate" style="position:absolute; bottom:10px; right:14px; font-size:0.8rem; font-weight:600; color:#F0E4C4;"></div>
+</header>
+
+<div class="frame-wrap">
+  <iframe id="frame-home" data-src="https://shaileshkumarrajoriya-byte.github.io/profit_dashboard/" class="hidden"></iframe>
+  <iframe id="frame-students" data-src="https://shaileshkumarrajoriya-byte.github.io/Van-Register/" class="hidden"></iframe>
+  <iframe id="frame-drivers" data-src="https://shaileshkumarrajoriya-byte.github.io/Driver-Manager/" class="hidden"></iframe>
+  <iframe id="frame-expenses" data-src="https://shaileshkumarrajoriya-byte.github.io/Vehicle-Expenses/" class="hidden"></iframe>
+  <iframe id="frame-loans" data-src="https://shaileshkumarrajoriya-byte.github.io/Loan-Tracker/" class="hidden"></iframe>
+</div>
+
+<div class="bottom-nav" id="bottomNav">
+  <div class="nav-items-row">
+    <button class="bottom-nav-item active" data-tab="home"><span class="nav-icon">🏠</span>Home</button>
+    <button class="bottom-nav-item" data-tab="students"><span class="nav-icon">🧑‍🎓</span>Students</button>
+    <button class="bottom-nav-item" data-tab="drivers"><span class="nav-icon">🧑‍✈️</span>Drivers</button>
+    <button class="bottom-nav-item" data-tab="expenses"><span class="nav-icon">🚐</span>Expenses</button>
+    <button class="bottom-nav-item" data-tab="loans"><span class="nav-icon">💰</span>Loans</button>
+  </div>
+  <div class="firm-info-strip" id="firmInfoStrip">
+    <img id="firmLogo" src="logo-header.png" alt="" style="display:none;">
+    <div id="firmInfoText">Loading firm details…</div>
+  </div>
+</div>
+
+<div id="settingsModalBg" style="position:fixed; inset:0; background:rgba(20,20,20,0.5); display:none; align-items:center; justify-content:center; z-index:90; padding:20px;">
+  <div style="background:#fff; border-radius:18px; padding:24px; max-width:360px; width:100%;">
+    <h3 style="font-family:'Bitter',serif; margin-top:0; color:var(--ink-dark);">Login & Security</h3>
+    <div class="field"><label>Change Username</label><input type="text" id="newUsername" placeholder="Leave blank to keep current"></div>
+    <div class="field"><label>Current Password</label><input type="password" id="currentPassword" autocomplete="current-password"></div>
+    <div class="field"><label>New Password</label><input type="password" id="newPassword" placeholder="Leave blank to keep current" autocomplete="new-password"></div>
+    <div class="login-error" id="passwordChangeError">Current password is incorrect</div>
+    <button class="btn" id="changeCredentialsBtn" type="button" style="margin-bottom:10px;">Update Username / Password</button>
+    <button class="btn" id="closeSettingsBtn" type="button" style="background:#fff; color:var(--muted); border:1px solid var(--paper-line);">Close</button>
+  </div>
+</div>
+
+<script>
+// ---------- Login gate ----------
+// Shared lock for the whole suite. Same caveat as before: this is a
+// client-side lock (keeps casual visitors out), not server-side security.
+const AUTH_KEY = 'suiteAuthCreds';
+const AUTH_SESSION_KEY = 'suiteAuthLoggedIn';
+
+function getAuthCreds(){
+  let creds = null;
+  try{ creds = JSON.parse(localStorage.getItem(AUTH_KEY)); }catch(e){}
+  if(!creds || !creds.username || !creds.password){
+    creds = { username: 'admin', password: 'admin123' };
+    localStorage.setItem(AUTH_KEY, JSON.stringify(creds));
+  }
+  return creds;
+}
+function isLoggedIn(){ return localStorage.getItem(AUTH_SESSION_KEY) === 'true'; }
+function showLoginScreen(){ document.getElementById('loginScreen').classList.remove('hidden'); }
+function hideLoginScreen(){ document.getElementById('loginScreen').classList.add('hidden'); }
+
+document.getElementById('loginBtn').addEventListener('click', ()=>{
+  const creds = getAuthCreds();
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if(u === creds.username && p === creds.password){
+    localStorage.setItem(AUTH_SESSION_KEY, 'true');
+    document.getElementById('loginError').style.display = 'none';
+    hideLoginScreen();
+    activateTab('home'); // lazy-load the first tab now that we're in
+    syncFrameOffsets();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+});
+document.getElementById('loginPass').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+document.getElementById('togglePassBtn').addEventListener('click', ()=>{
+  const input = document.getElementById('loginPass');
+  const btn = document.getElementById('togglePassBtn');
+  if(input.type === 'password'){ input.type = 'text'; btn.textContent = '🙈'; }
+  else{ input.type = 'password'; btn.textContent = '👁️'; }
+});
+document.getElementById('forgotPassBtn').addEventListener('click', ()=>{
+  const creds = getAuthCreds();
+  alert('Aapka current username hai: "' + creds.username + '"\n\nPassword bhool gaye hain to kisi bhi installed app (jaise Van Register) mein login karke Settings mein jaakar dekhein, ya humse contact karein.');
+});
+document.getElementById('logoutTopBtn').addEventListener('click', ()=>{
+  if(confirm('Log out of Business Suite?')){
+    localStorage.removeItem(AUTH_SESSION_KEY);
+    showLoginScreen();
+  }
+});
+
+document.getElementById('settingsTopBtn').addEventListener('click', ()=>{
+  document.getElementById('settingsModalBg').style.display = 'flex';
+});
+document.getElementById('closeSettingsBtn').addEventListener('click', ()=>{
+  document.getElementById('settingsModalBg').style.display = 'none';
+  document.getElementById('passwordChangeError').style.display = 'none';
+  document.getElementById('newUsername').value = '';
+  document.getElementById('currentPassword').value = '';
+  document.getElementById('newPassword').value = '';
+});
+document.getElementById('changeCredentialsBtn').addEventListener('click', ()=>{
+  const creds = getAuthCreds();
+  const curPass = document.getElementById('currentPassword').value;
+  const newUser = document.getElementById('newUsername').value.trim();
+  const newPass = document.getElementById('newPassword').value;
+  const errEl = document.getElementById('passwordChangeError');
+  if(curPass !== creds.password){
+    errEl.textContent = 'Current password is incorrect';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  localStorage.setItem(AUTH_KEY, JSON.stringify({
+    username: newUser || creds.username,
+    password: newPass || creds.password
+  }));
+  document.getElementById('newUsername').value = '';
+  document.getElementById('currentPassword').value = '';
+  document.getElementById('newPassword').value = '';
+  alert('✓ Login details updated');
+  document.getElementById('settingsModalBg').style.display = 'none';
+});
+
+getAuthCreds();
+if(isLoggedIn()){ hideLoginScreen(); } else { showLoginScreen(); }
+
+// ---------- Tab switching (with lazy iframe loading) ----------
+const TAB_LABELS = { home:'Home', students:'Students', drivers:'Drivers', expenses:'Expenses', loans:'Loans' };
+const loadedFrames = {};
+
+function activateTab(tab){
+  document.querySelectorAll('.bottom-nav-item').forEach(b=>b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('tabTitle').textContent = TAB_LABELS[tab] || '';
+
+  document.querySelectorAll('.frame-wrap iframe').forEach(f=>f.classList.add('hidden'));
+  document.querySelectorAll('.placeholder').forEach(p=>p.classList.remove('show'));
+
+  const frame = document.getElementById('frame-' + tab);
+  if(frame){
+    if(!loadedFrames[tab]){
+      frame.src = frame.dataset.src;
+      loadedFrames[tab] = true;
+    }
+    frame.classList.remove('hidden');
+  } else {
+    const ph = document.getElementById('placeholder-' + tab);
+    if(ph) ph.classList.add('show');
+  }
+}
+
+document.getElementById('bottomNav').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.bottom-nav-item');
+  if(!btn) return;
+  activateTab(btn.dataset.tab);
+});
+
+if(isLoggedIn()){ activateTab('home'); syncFrameOffsets(); }
+
+// ---------- Keep frame offsets correct (header/bottom-nav always visible) ----------
+function syncFrameOffsets(){
+  const headerH = document.querySelector('header').offsetHeight;
+  const navH = document.getElementById('bottomNav').offsetHeight;
+  document.documentElement.style.setProperty('--header-h', headerH + 'px');
+  document.documentElement.style.setProperty('--nav-h', navH + 'px');
+}
+window.addEventListener('resize', syncFrameOffsets);
+
+// ---------- Firm info footer (pulled once from Van Register's data) ----------
+async function loadFirmInfo(){
+  const textEl = document.getElementById('firmInfoText');
+  const logoEl = document.getElementById('firmLogo');
+  try{
+    const res = await fetch('https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app/data.json');
+    const data = await res.json();
+    const parsed = data && data.value ? JSON.parse(data.value) : null;
+    const biz = parsed && parsed.business;
+    if(!biz || !biz.name){ textEl.textContent = ''; syncFrameOffsets(); return; }
+    const parts = [];
+    if(biz.regNo) parts.push('Reg No: ' + biz.regNo);
+    if(biz.gst) parts.push('GSTIN: ' + biz.gst);
+    if(biz.phone) parts.push('☎ ' + biz.phone);
+    textEl.innerHTML = `<span class="firm-name">${biz.name}</span>` + (parts.length ? '<br>' + parts.join(' · ') : '');
+    logoEl.style.display = 'block';
+
+    // Login screen firm details
+    document.getElementById('lsFirmName').textContent = biz.name;
+    document.getElementById('lsFirmSub').textContent = '';
+    document.getElementById('lsRegNo').textContent = biz.regNo || '—';
+    document.getElementById('lsGst').textContent = biz.gst || '—';
+    document.getElementById('lsPhone').textContent = biz.phone || '—';
+    document.getElementById('lsAddress').textContent = biz.name + (biz.address ? ' — ' + biz.address : '');
+    document.getElementById('lsFooter').textContent = 'For Support Contact: ' + (biz.phone || '—');
+  }catch(e){
+    textEl.textContent = '';
+  }
+  syncFrameOffsets();
+}
+loadFirmInfo();
+
+// ---------- Live time & date ----------
+function updateClock(){
+  const now = new Date();
+  document.getElementById('liveTime').textContent = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+  document.getElementById('liveDate').textContent = now.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+}
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
