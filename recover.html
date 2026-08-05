@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Backup Checker</title>
+<style>
+  body{ font-family: sans-serif; padding: 16px; background:#FBF9F4; color:#2B2E33; }
+  h2{ font-family: serif; }
+  button{ background:#C9A227; color:#fff; border:none; padding:12px 18px; border-radius:8px; font-size:1rem; margin-bottom:14px; }
+  textarea{ width:100%; height:200px; font-family:monospace; font-size:0.75rem; }
+  .key-row{ margin-bottom:8px; padding:10px; background:#fff; border:1px solid #E7E1D3; border-radius:8px; }
+  .found{ color:#3F7859; font-weight:bold; }
+  .missing{ color:#B23B31; }
+</style>
+</head>
+<body>
+<h2>Local Backup Checker</h2>
+<p>Ye tool sirf is phone/browser mein locally saved (cached) data check karta hai. Kisi bhi cheez ko change ya delete nahi karta — sirf dikhata hai.</p>
+<button onclick="checkAll()">Check Local Data</button>
+<div id="results"></div>
+<h3>Raw data (agar aage recovery ke liye chahiye ho):</h3>
+<select id="keySelect" onchange="showRaw()">
+  <option value="data">Van Register (data)</option>
+  <option value="driverData">Driver Manager (driverData)</option>
+  <option value="expenseData">Vehicle Expenses (expenseData)</option>
+  <option value="loanData">Loan Tracker (loanData)</option>
+  <option value="sharedVehicles">Shared Vehicles</option>
+</select>
+<textarea id="rawOut" readonly></textarea>
+
+<script>
+const KEYS = [
+  {key:'data', label:'Van Register'},
+  {key:'driverData', label:'Driver Manager'},
+  {key:'expenseData', label:'Vehicle Expenses'},
+  {key:'loanData', label:'Loan Tracker'},
+  {key:'sharedVehicles', label:'Shared Vehicles'}
+];
+
+function checkAll(){
+  const el = document.getElementById('results');
+  el.innerHTML = '';
+  KEYS.forEach(({key, label})=>{
+    const v = localStorage.getItem(key);
+    const row = document.createElement('div');
+    row.className = 'key-row';
+    if(v){
+      let extra = '';
+      try{
+        const parsed = JSON.parse(v);
+        if(parsed.fees){
+          const dates = Object.values(parsed.fees).map(f=>f.lastDate).filter(Boolean).sort();
+          extra = '<br>Latest fee entry date found: <b>' + (dates[dates.length-1] || 'none') + '</b>';
+        }
+      }catch(e){}
+      row.innerHTML = `<b>${label}</b> (${key}): <span class="found">Found</span> — ${v.length} characters${extra}`;
+    } else {
+      row.innerHTML = `<b>${label}</b> (${key}): <span class="missing">Not found on this device</span>`;
+    }
+    el.appendChild(row);
+  });
+  showRaw();
+}
+
+function showRaw(){
+  const key = document.getElementById('keySelect').value;
+  const v = localStorage.getItem(key);
+  document.getElementById('rawOut').value = v || '(nothing found for this key on this device)';
+}
+</script>
+</body>
+</html>
