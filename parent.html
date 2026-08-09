@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d1626">
+<title>Fee Status — Shree Maa Narmada Auto Mobile's & Travels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #141414;
+    --ink-dark: #0d1626;
+    --paper: #FBF9F4;
+    --paper-line: #E7E1D3;
+    --brass: #2F5DA8;
+    --brass-deep: #1B3A6B;
+    --brass-light: #A9C2E8;
+    --paid: #3F7859;
+    --paid-bg: #E4EFE8;
+    --due: #B23B31;
+    --due-bg: #F7E6E3;
+    --warn: #96650F;
+    --warn-bg: #FCEFD9;
+    --text: #2B2E33;
+    --muted: #6B7280;
+    --shadow-card: 0 1px 2px rgba(20,15,5,0.05), 0 14px 32px rgba(20,15,5,0.09);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body{ height:100%; margin:0; }
+  body{
+    background: var(--paper); color: var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    padding-bottom: 30px;
+  }
+  header{
+    background: radial-gradient(circle at 50% 0%, rgba(47,93,168,0.16), transparent 55%),
+      linear-gradient(165deg, #17203a 0%, #0d1626 60%, #050810 100%);
+    color:#fff; padding: 24px 20px 30px; text-align:center;
+    border-bottom: 3px solid var(--brass);
+  }
+  header img{
+    height:56px; width:auto; margin-bottom:10px;
+  }
+  header h1{
+    font-family:'Bitter',serif; font-weight:800; font-size:1.15rem; margin:0 0 4px;
+    color:#F1F3F8; letter-spacing:0.2px;
+  }
+  header p{ margin:0; font-size:0.72rem; color:#9FB8DD; letter-spacing:1px; text-transform:uppercase; }
+
+  .wrap{ max-width:440px; margin:0 auto; padding: 0 16px; }
+
+  /* ---------- Login screen ---------- */
+  #loginScreen{ padding-top: 34px; }
+  .login-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:20px;
+    padding:28px 22px; box-shadow: var(--shadow-card); text-align:center;
+  }
+  .login-icon{
+    width:64px; height:64px; border-radius:50%; margin:0 auto 16px;
+    background: linear-gradient(155deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+    display:flex; align-items:center; justify-content:center; color:#fff;
+    box-shadow: 0 8px 20px rgba(47,93,168,0.3);
+  }
+  .login-card h2{ font-family:'Bitter',serif; font-size:1.15rem; margin:0 0 6px; color:var(--ink-dark); }
+  .login-card p{ font-size:0.82rem; color:var(--muted); margin:0 0 20px; line-height:1.5; }
+  .phone-input-row{
+    display:flex; align-items:center; border:1.5px solid var(--paper-line); border-radius:12px;
+    overflow:hidden; margin-bottom:14px;
+  }
+  .phone-prefix{ padding:13px 10px 13px 14px; color:var(--muted); font-weight:600; background:#FAF8F2; border-right:1px solid var(--paper-line); }
+  #phoneInput{
+    flex:1; border:none; outline:none; padding:13px 12px; font-size:1rem;
+    font-family:'JetBrains Mono',monospace; letter-spacing:1px;
+  }
+  #loginBtn{
+    width:100%; background: linear-gradient(160deg, var(--brass-light) 0%, var(--brass) 45%, var(--brass-deep) 100%);
+    color:#fff; border:none; padding:14px; border-radius:12px; font-weight:700; font-size:0.95rem;
+    cursor:pointer; box-shadow: 0 6px 18px rgba(47,93,168,0.28);
+  }
+  #loginBtn:active{ transform:scale(0.98); }
+  #loginError{ color:var(--due); font-size:0.82rem; margin-top:12px; min-height:18px; }
+  #loginLoading{ display:none; color:var(--muted); font-size:0.82rem; margin-top:12px; }
+
+  /* ---------- Child picker (if multiple kids share a phone) ---------- */
+  #pickerScreen{ display:none; padding-top:24px; }
+  .picker-title{ font-family:'Bitter',serif; font-weight:700; font-size:1.05rem; margin: 4px 4px 14px; color:var(--ink-dark); }
+  .picker-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:16px; padding:16px;
+    display:flex; align-items:center; gap:12px; margin-bottom:12px; cursor:pointer;
+    box-shadow: var(--shadow-card);
+  }
+  .picker-card:active{ transform:scale(0.98); }
+  .picker-avatar{
+    width:44px; height:44px; border-radius:50%; flex-shrink:0; object-fit:cover;
+    background: linear-gradient(155deg, var(--brass-light), var(--brass));
+  }
+  .picker-avatar-placeholder{
+    width:44px; height:44px; border-radius:50%; flex-shrink:0;
+    background: linear-gradient(155deg, var(--brass-light), var(--brass));
+    display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700;
+  }
+  .picker-name{ font-weight:700; color:var(--ink-dark); font-size:0.95rem; }
+  .picker-meta{ font-size:0.76rem; color:var(--muted); margin-top:2px; }
+
+  /* ---------- Dashboard ---------- */
+  #dashScreen{ display:none; padding-top:20px; }
+  .back-row{ display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+  .back-btn{
+    background:#fff; border:1px solid var(--paper-line); border-radius:10px; width:36px; height:36px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink-dark);
+  }
+  .student-head{
+    background: linear-gradient(155deg, #17203a 0%, #0d1626 60%, #050810 100%);
+    border-radius:18px 18px 0 0; padding:20px 18px 16px; display:flex; align-items:center; gap:12px;
+    position:relative; overflow:hidden;
+  }
+  .student-head::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; height:3px;
+    background: linear-gradient(90deg, var(--brass-deep), var(--brass), var(--brass-light));
+  }
+  .student-photo{ width:52px; height:52px; border-radius:50%; object-fit:cover; border:2px solid var(--brass-light); flex-shrink:0; }
+  .student-photo-placeholder{
+    width:52px; height:52px; border-radius:50%; flex-shrink:0; border:2px solid var(--brass-light);
+    background: linear-gradient(155deg, var(--brass-light), var(--brass), var(--brass-deep));
+    display:flex; align-items:center; justify-content:center; color:#fff;
+  }
+  .student-name{ font-family:'Bitter',serif; font-weight:700; font-size:1.08rem; color:#F1F3F8; }
+  .student-sub{ font-size:0.76rem; color:#9FB8DD; margin-top:3px; }
+  .student-card-body{
+    background:#fff; border:1px solid var(--paper-line); border-top:none; border-radius:0 0 18px 18px;
+    padding:18px; box-shadow: var(--shadow-card); margin-bottom:18px;
+  }
+  .due-banner{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background: var(--due-bg); border-radius:12px; padding:14px 16px; margin-bottom:16px;
+  }
+  .due-banner.clear{ background: var(--paid-bg); }
+  .due-label{ font-size:0.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .due-amount{ font-family:'JetBrains Mono',monospace; font-weight:800; font-size:1.5rem; color:var(--due); }
+  .due-banner.clear .due-amount{ color:var(--paid); }
+  .section-label{ font-size:0.72rem; font-weight:700; letter-spacing:1.5px; color:var(--brass-deep); text-transform:uppercase; margin: 4px 0 12px; }
+  .month-grid{ display:grid; grid-template-columns: repeat(5,1fr); gap:8px; margin-bottom:8px; }
+  .month-cell{ display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .month-circle{
+    width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:0.68rem; font-weight:700;
+  }
+  .month-circle.paid{ background:var(--paid); color:#fff; }
+  .month-circle.partial{ background:var(--warn-bg); color:var(--warn); border:2px solid var(--warn); }
+  .month-circle.due{ background:var(--due-bg); color:var(--due); border:2px solid var(--due); }
+  .month-circle.upcoming{ background:#F0EDE3; color:var(--muted); border:2px solid var(--paper-line); }
+  .month-label{ font-size:0.62rem; color:var(--muted); font-weight:600; }
+  .legend{ display:flex; flex-wrap:wrap; gap:10px; margin: 14px 0; font-size:0.7rem; color:var(--muted); }
+  .legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .legend .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  #payNowBtn{
+    width:100%; background: linear-gradient(160deg, var(--brass-light) 0%, var(--brass) 45%, var(--brass-deep) 100%);
+    color:#fff; border:none; padding:15px; border-radius:12px; font-weight:700; font-size:1rem;
+    cursor:pointer; box-shadow: 0 8px 20px rgba(47,93,168,0.3); margin-top:6px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  #payNowBtn:active{ transform:scale(0.98); }
+  .contact-note{ text-align:center; font-size:0.74rem; color:var(--muted); margin-top:14px; line-height:1.5; }
+  .contact-note a{ color:var(--brass-deep); font-weight:600; text-decoration:none; }
+
+  footer{ text-align:center; font-size:0.7rem; color:var(--muted); margin-top:30px; padding: 0 20px; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo-header.png" alt="Logo" onerror="this.style.display='none'">
+  <h1>SHREE MAA NARMADA AUTO MOBILE'S &amp; TRAVELS</h1>
+  <p>Parent Fee Portal</p>
+</header>
+
+<div class="wrap">
+
+  <!-- Login -->
+  <div id="loginScreen">
+    <div class="login-card">
+      <div class="login-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </div>
+      <h2>Apna Fee Status Dekhein</h2>
+      <p>Apna registered mobile number daalein — jo humare paas van fee ke record mein darj hai.</p>
+      <div class="phone-input-row">
+        <span class="phone-prefix">+91</span>
+        <input type="tel" id="phoneInput" placeholder="10 digit number" maxlength="10" inputmode="numeric">
+      </div>
+      <button type="button" id="loginBtn">Dekhein</button>
+      <div id="loginLoading">Dhoond rahe hain…</div>
+      <div id="loginError"></div>
+    </div>
+    <div class="contact-note">
+      Number match nahi ho raha? Office se sampark karein:<br>
+      <a href="tel:7036407670">7036407670</a> · <a href="tel:7909407670">7909407670</a>
+    </div>
+  </div>
+
+  <!-- Multiple children picker -->
+  <div id="pickerScreen">
+    <div class="picker-title">Kis bachche ka fee status dekhna hai?</div>
+    <div id="pickerList"></div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashScreen">
+    <div class="back-row">
+      <button type="button" class="back-btn" id="backBtn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </button>
+      <div style="font-size:0.82rem;color:var(--muted);">Wapas jaayein</div>
+    </div>
+
+    <div class="student-head">
+      <img id="studentPhoto" class="student-photo" style="display:none;">
+      <div id="studentPhotoPlaceholder" class="student-photo-placeholder">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.3"/><path d="M5 20c0-3.4 3-6 7-6s7 2.6 7 6"/></svg>
+      </div>
+      <div>
+        <div class="student-name" id="studentName">—</div>
+        <div class="student-sub" id="studentSub">—</div>
+      </div>
+    </div>
+
+    <div class="student-card-body">
+      <div class="due-banner" id="dueBanner">
+        <div>
+          <div class="due-label">Total Bakaya (Due)</div>
+          <div class="due-amount" id="dueAmount">₹0</div>
+        </div>
+        <svg id="dueIcon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--due);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+
+      <div class="section-label">Mahine ke Hisaab se Status</div>
+      <div class="month-grid" id="monthGrid"></div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--paid);"></span>Paid</span>
+        <span><span class="dot" style="background:var(--warn);"></span>Half Paid</span>
+        <span><span class="dot" style="background:var(--due);"></span>Due</span>
+        <span><span class="dot" style="background:var(--paper-line);"></span>Not Yet Due</span>
+      </div>
+
+      <button type="button" id="payNowBtn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Fee Pay Karein
+      </button>
+      <div class="contact-note">Payment se koi dikkat ho to office se sampark karein:<br>
+        <a href="tel:7036407670">7036407670</a> · <a href="tel:7909407670">7909407670</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  SHREE MAA NARMADA AUTO MOBILE'S &amp; TRAVELS<br>
+  Reg No: UDYAM-MP-32-0014395 · GSTIN: 23BORPR8040F1ZP
+</footer>
+
+<script>
+const FIREBASE_DB_URL = 'https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app';
+const MONTHS = ["Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr"];
+const MONTH_KEYS = ["07","08","09","10","11","12","01","02","03","04"];
+
+let state = { students: [], schools: [], vehicles: [], fees: {} };
+let currentYear = getAcademicYearStart();
+let matchedStudents = [];
+
+function getAcademicYearStart(date){
+  date = date || new Date();
+  const m = date.getMonth() + 1;
+  const y = date.getFullYear();
+  return (m <= 4) ? (y - 1) : y;
+}
+function yearForMonth(mk){ return (parseInt(mk,10) >= 7) ? currentYear : (currentYear + 1); }
+function cleanPhone(phone){
+  if(!phone) return '';
+  let digits = String(phone).replace(/[^0-9]/g, '');
+  if(digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
+  return digits;
+}
+function feeKey(studentId, mk){ return studentId + '_' + mk + '_' + yearForMonth(mk); }
+function paidAmountFor(studentId, mk){
+  const rec = state.fees[feeKey(studentId, mk)];
+  return rec ? Number(rec.amountPaid||0) : 0;
+}
+function dueAmountForMonth(student, mk){
+  return Math.max(0, Number(student.fee||0) - paidAmountFor(student.id, mk));
+}
+function isMonthOverdue(mk){
+  const feeYear = yearForMonth(mk);
+  const feeMonth = parseInt(mk, 10);
+  const now = new Date();
+  const nowYear = now.getFullYear();
+  const nowMonth = now.getMonth() + 1;
+  if(nowYear > feeYear) return true;
+  if(nowYear === feeYear && nowMonth > feeMonth) return true;
+  return false;
+}
+function feeStatus(student, mk){
+  const fee = Number(student.fee||0);
+  const paidAmt = paidAmountFor(student.id, mk);
+  if(fee <= 0) return paidAmt > 0 ? 'paid' : (isMonthOverdue(mk) ? 'due' : 'upcoming');
+  if(paidAmt >= fee) return 'paid';
+  if(paidAmt > 0) return 'partial';
+  return isMonthOverdue(mk) ? 'due' : 'upcoming';
+}
+function schoolName(id){
+  const sc = state.schools.find(s=>s.id===id);
+  return sc ? sc.name : '';
+}
+function vehicleName(id){
+  const v = state.vehicles.find(v=>v.name===id || v.id===id);
+  return v ? v.name : '';
+}
+
+async function loadData(){
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/data.json`);
+    const raw = await res.json();
+    if(raw && raw.value){
+      const parsed = JSON.parse(raw.value);
+      state.students = parsed.students || [];
+      state.schools = parsed.schools || [];
+      state.vehicles = parsed.vehicles || [];
+      state.fees = parsed.fees || {};
+    }
+  }catch(e){
+    console.error('Load failed', e);
+  }
+}
+
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const input = document.getElementById('phoneInput');
+  const errorEl = document.getElementById('loginError');
+  const loadingEl = document.getElementById('loginLoading');
+  errorEl.textContent = '';
+  const digits = input.value.replace(/[^0-9]/g,'');
+  if(digits.length !== 10){
+    errorEl.textContent = 'Kripya 10 digit ka sahi mobile number daalein.';
+    return;
+  }
+  loadingEl.style.display = 'block';
+  await loadData();
+  loadingEl.style.display = 'none';
+
+  matchedStudents = state.students.filter(s => cleanPhone(s.phone) === digits);
+  if(matchedStudents.length === 0){
+    errorEl.textContent = 'Is number se koi student nahi mila. Office se sampark karein.';
+    return;
+  }
+  if(matchedStudents.length === 1){
+    showDashboard(matchedStudents[0]);
+  } else {
+    showPicker(matchedStudents);
+  }
+});
+
+document.getElementById('phoneInput').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+
+function showPicker(students){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('pickerScreen').style.display = 'block';
+  document.getElementById('pickerList').innerHTML = students.map((s,i)=>`
+    <div class="picker-card" data-idx="${i}">
+      ${s.photo
+        ? `<img src="${s.photo}" class="picker-avatar">`
+        : `<div class="picker-avatar-placeholder">${(s.name||'?').charAt(0).toUpperCase()}</div>`}
+      <div>
+        <div class="picker-name">${s.name}</div>
+        <div class="picker-meta">${schoolName(s.schoolId)}${s.class ? ' · Class '+s.class : ''}</div>
+      </div>
+    </div>
+  `).join('');
+  document.querySelectorAll('.picker-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      showDashboard(students[Number(card.dataset.idx)]);
+    });
+  });
+}
+
+function showDashboard(student){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('pickerScreen').style.display = 'none';
+  document.getElementById('dashScreen').style.display = 'block';
+
+  if(student.photo){
+    document.getElementById('studentPhoto').src = student.photo;
+    document.getElementById('studentPhoto').style.display = 'block';
+    document.getElementById('studentPhotoPlaceholder').style.display = 'none';
+  } else {
+    document.getElementById('studentPhoto').style.display = 'none';
+    document.getElementById('studentPhotoPlaceholder').style.display = 'flex';
+  }
+  document.getElementById('studentName').textContent = student.name;
+  document.getElementById('studentSub').textContent =
+    [schoolName(student.schoolId), student.class ? 'Class '+student.class : '', vehicleName(student.vehicleId)].filter(Boolean).join(' · ');
+
+  let totalDue = 0;
+  const grid = document.getElementById('monthGrid');
+  grid.innerHTML = MONTH_KEYS.map((mk, i)=>{
+    const status = feeStatus(student, mk);
+    if(status === 'due' || status === 'partial'){
+      totalDue += dueAmountForMonth(student, mk);
+    }
+    return `
+    <div class="month-cell">
+      <div class="month-circle ${status}">${status==='paid' ? '✓' : ''}</div>
+      <div class="month-label">${MONTHS[i]}</div>
+    </div>`;
+  }).join('');
+
+  const dueBanner = document.getElementById('dueBanner');
+  const dueIcon = document.getElementById('dueIcon');
+  document.getElementById('dueAmount').textContent = '₹' + totalDue;
+  if(totalDue > 0){
+    dueBanner.classList.remove('clear');
+    dueIcon.style.color = 'var(--due)';
+  } else {
+    dueBanner.classList.add('clear');
+    dueIcon.style.color = 'var(--paid)';
+    dueIcon.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+  }
+
+  document.getElementById('payNowBtn').onclick = ()=>{
+    alert('Online payment jald hi shuru hoga. Abhi ke liye office se sampark karein:\n7036407670 / 7909407670');
+  };
+}
+
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  document.getElementById('dashScreen').style.display = 'none';
+  if(matchedStudents.length > 1){
+    document.getElementById('pickerScreen').style.display = 'block';
+  } else {
+    document.getElementById('loginScreen').style.display = 'block';
+    document.getElementById('phoneInput').value = '';
+  }
+});
+</script>
+</body>
+</html>
