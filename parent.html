@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d1626">
+<link rel="manifest" href="manifest-parent.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fee Portal">
+<title>Fee Status — Shree Maa Narmada Auto Mobile's & Travels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #141414;
+    --ink-dark: #0d1626;
+    --paper: #FBF9F4;
+    --paper-line: #E7E1D3;
+    --brass: #2F5DA8;
+    --brass-deep: #1B3A6B;
+    --brass-light: #A9C2E8;
+    --paid: #3F7859;
+    --paid-bg: #E4EFE8;
+    --due: #B23B31;
+    --due-bg: #F7E6E3;
+    --warn: #96650F;
+    --warn-bg: #FCEFD9;
+    --text: #2B2E33;
+    --muted: #6B7280;
+    --shadow-card: 0 1px 2px rgba(20,15,5,0.05), 0 14px 32px rgba(20,15,5,0.09);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body{ height:100%; margin:0; }
+  body{
+    background: var(--paper); color: var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    padding-bottom: 30px;
+  }
+  header{
+    background: radial-gradient(circle at 50% 0%, rgba(47,93,168,0.16), transparent 55%),
+      linear-gradient(165deg, #17203a 0%, #0d1626 60%, #050810 100%);
+    color:#fff; padding: 24px 20px 30px; text-align:center;
+    border-bottom: 3px solid var(--brass);
+  }
+  header img{
+    height:56px; width:auto; margin-bottom:10px;
+  }
+  header h1{
+    font-family:'Bitter',serif; font-weight:800; font-size:1.15rem; margin:0 0 4px;
+    color:#F1F3F8; letter-spacing:0.2px;
+  }
+  header p{ margin:0; font-size:0.72rem; color:#9FB8DD; letter-spacing:1px; text-transform:uppercase; }
+
+  .wrap{ max-width:440px; margin:0 auto; padding: 0 16px; }
+
+  /* ---------- Login screen ---------- */
+  #loginScreen{ padding-top: 34px; }
+  .login-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:20px;
+    padding:28px 22px; box-shadow: var(--shadow-card); text-align:center;
+  }
+  .login-icon{
+    width:64px; height:64px; border-radius:50%; margin:0 auto 16px;
+    background: linear-gradient(155deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+    display:flex; align-items:center; justify-content:center; color:#fff;
+    box-shadow: 0 8px 20px rgba(47,93,168,0.3);
+  }
+  .login-card h2{ font-family:'Bitter',serif; font-size:1.15rem; margin:0 0 6px; color:var(--ink-dark); }
+  .login-card p{ font-size:0.82rem; color:var(--muted); margin:0 0 20px; line-height:1.5; }
+  .phone-input-row{
+    display:flex; align-items:center; border:1.5px solid var(--paper-line); border-radius:12px;
+    overflow:hidden; margin-bottom:14px;
+  }
+  .phone-prefix{ padding:13px 10px 13px 14px; color:var(--muted); font-weight:600; background:#FAF8F2; border-right:1px solid var(--paper-line); }
+  #phoneInput{
+    flex:1; border:none; outline:none; padding:13px 12px; font-size:1rem;
+    font-family:'JetBrains Mono',monospace; letter-spacing:1px;
+  }
+  #loginBtn{
+    width:100%; background: linear-gradient(160deg, var(--brass-light) 0%, var(--brass) 45%, var(--brass-deep) 100%);
+    color:#fff; border:none; padding:14px; border-radius:12px; font-weight:700; font-size:0.95rem;
+    cursor:pointer; box-shadow: 0 6px 18px rgba(47,93,168,0.28);
+  }
+  #loginBtn:active{ transform:scale(0.98); }
+  #loginError{ color:var(--due); font-size:0.82rem; margin-top:12px; min-height:18px; }
+  #loginLoading{ display:none; color:var(--muted); font-size:0.82rem; margin-top:12px; }
+
+  /* ---------- Child picker (if multiple kids share a phone) ---------- */
+  #pickerScreen{ display:none; padding-top:24px; }
+  .picker-title{ font-family:'Bitter',serif; font-weight:700; font-size:1.05rem; margin: 4px 4px 14px; color:var(--ink-dark); }
+  .picker-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:16px; padding:16px;
+    display:flex; align-items:center; gap:12px; margin-bottom:12px; cursor:pointer;
+    box-shadow: var(--shadow-card);
+  }
+  .picker-card:active{ transform:scale(0.98); }
+  .picker-avatar{
+    width:44px; height:44px; border-radius:50%; flex-shrink:0; object-fit:cover;
+    background: linear-gradient(155deg, var(--brass-light), var(--brass));
+  }
+  .picker-avatar-placeholder{
+    width:44px; height:44px; border-radius:50%; flex-shrink:0;
+    background: linear-gradient(155deg, var(--brass-light), var(--brass));
+    display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700;
+  }
+  .picker-name{ font-weight:700; color:var(--ink-dark); font-size:0.95rem; }
+  .picker-meta{ font-size:0.76rem; color:var(--muted); margin-top:2px; }
+
+  /* ---------- Dashboard ---------- */
+  #dashScreen{ display:none; padding-top:20px; }
+  .back-row{ display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+  .back-btn{
+    background:#fff; border:1px solid var(--paper-line); border-radius:10px; width:36px; height:36px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink-dark);
+  }
+  .student-head{
+    position:relative;
+    padding:15px 16px 13px;
+    background: linear-gradient(155deg, #232019 0%, #16130d 55%, #0a0906 100%);
+    display:flex; align-items:center; gap:12px;
+    border-radius:18px 18px 0 0; overflow:hidden;
+  }
+  .student-head::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; height:3px;
+    background: linear-gradient(90deg, var(--brass-deep), var(--brass), var(--brass-light));
+  }
+  .student-photo{
+    width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;
+    border:2px solid var(--brass-light); box-shadow:0 4px 10px rgba(0,0,0,0.4);
+  }
+  .student-photo-placeholder{
+    width:48px;height:48px;border-radius:50%;flex-shrink:0;
+    background: linear-gradient(155deg,#A9C2E8 0%,#2F5DA8 55%,#1B3A6B 100%);
+    display:flex;align-items:center;justify-content:center;color:#0d1626;
+    border:2px solid var(--brass-light); box-shadow:0 4px 10px rgba(0,0,0,0.4);
+  }
+  .student-id-chip{
+    font-family:'JetBrains Mono',monospace; font-size:0.66rem; font-weight:700;
+    color:#0d1626; background: var(--brass-light); padding:1px 6px; border-radius:5px;
+    margin-right:6px; vertical-align:1px;
+  }
+  .student-name{ font-family:'Bitter',serif; font-weight:700; font-size:1.03rem; color:#EFF3FA; line-height:1.3; }
+  .student-sub{ font-size:0.72rem; color:#8FA5C9; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .student-fee-pill{ margin-left:auto; flex-shrink:0; text-align:right; }
+  .student-fee-amt{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:0.95rem; color:#A9C2E8; }
+  .student-fee-label{ font-size:0.6rem; color:#8a7a55; letter-spacing:0.3px; text-transform:uppercase; margin-top:1px; }
+  .student-info-rows{ background:#fff; border:1px solid var(--paper-line); border-top:none; padding:12px 16px 4px; }
+  .student-info-row{
+    display:flex; align-items:flex-start; gap:8px;
+    font-size:0.82rem; color:var(--text); padding:6px 0;
+    border-bottom:1px dashed var(--paper-line);
+  }
+  .student-info-row:last-child{ border-bottom:none; }
+  .student-info-row .si-label{ color:var(--muted); min-width:58px; flex-shrink:0; font-size:0.72rem; padding-top:1px; }
+  .student-info-row .si-value{ flex:1; font-weight:600; color:var(--ink-dark); }
+  .student-card-body{
+    background:#fff; border:1px solid var(--paper-line); border-top:none; border-radius:0 0 18px 18px;
+    padding:18px; box-shadow: var(--shadow-card); margin-bottom:18px;
+  }
+  .due-banner{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background: var(--due-bg); border-radius:12px; padding:14px 16px; margin-bottom:16px;
+  }
+  .due-banner.clear{ background: var(--paid-bg); }
+  .due-label{ font-size:0.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .due-amount{ font-family:'JetBrains Mono',monospace; font-weight:800; font-size:1.5rem; color:var(--due); }
+  .due-banner.clear .due-amount{ color:var(--paid); }
+  .section-label{ font-size:0.72rem; font-weight:700; letter-spacing:1.5px; color:var(--brass-deep); text-transform:uppercase; margin: 4px 0 12px; }
+  .month-table{ width:100%; border-collapse:collapse; margin-bottom:8px; }
+  .month-table th{
+    font-size:0.64rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px;
+    text-align:left; padding:6px 4px; border-bottom:1.5px solid var(--paper-line);
+  }
+  .month-table td{ padding:9px 4px; border-bottom:1px dashed var(--paper-line); font-size:0.78rem; vertical-align:middle; }
+  .month-table tr:last-child td{ border-bottom:none; }
+  .mt-status{
+    display:inline-block; font-size:0.64rem; font-weight:700; padding:3px 8px; border-radius:20px;
+  }
+  .mt-status.paid{ background:var(--paid-bg); color:var(--paid); }
+  .mt-status.partial{ background:var(--warn-bg); color:var(--warn); }
+  .mt-status.due{ background:var(--due-bg); color:var(--due); }
+  .mt-status.upcoming{ background:#F0EDE3; color:var(--muted); }
+  .mt-amount{ font-family:'JetBrains Mono',monospace; font-weight:700; }
+  .mt-amount.paid-col{ color:var(--paid); }
+  .mt-amount.due-col{ color:var(--due); }
+  .mt-date{ color:var(--muted); font-size:0.7rem; }
+
+  .bill-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:12px; padding:12px 14px;
+    display:flex; align-items:center; gap:10px; margin-bottom:8px;
+  }
+  .bill-icon{
+    width:34px; height:34px; border-radius:9px; flex-shrink:0; background:var(--paper);
+    display:flex; align-items:center; justify-content:center; color:var(--brass-deep);
+  }
+  .bill-no{ font-weight:700; font-size:0.82rem; color:var(--ink-dark); }
+  .bill-meta{ font-size:0.72rem; color:var(--muted); margin-top:2px; }
+  .bill-amt{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:0.85rem; color:var(--ink-dark); margin-left:auto; text-align:right; }
+  .bill-view-btn{
+    background:var(--paper); border:1px solid var(--paper-line); color:var(--brass-deep);
+    border-radius:8px; padding:5px 10px; font-size:0.7rem; font-weight:700; cursor:pointer; margin-top:4px;
+  }
+  .empty-note{ font-size:0.8rem; color:var(--muted); text-align:center; padding:14px 0; }
+  #payNowBtn{
+    width:100%; background: linear-gradient(160deg, var(--brass-light) 0%, var(--brass) 45%, var(--brass-deep) 100%);
+    color:#fff; border:none; padding:15px; border-radius:12px; font-weight:700; font-size:1rem;
+    cursor:pointer; box-shadow: 0 8px 20px rgba(47,93,168,0.3); margin-top:6px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  #payNowBtn:active{ transform:scale(0.98); }
+  .contact-note{ text-align:center; font-size:0.74rem; color:var(--muted); margin-top:14px; line-height:1.5; }
+  .contact-note a{ color:var(--brass-deep); font-weight:600; text-decoration:none; }
+
+  .contact-btn-row{ display:flex; gap:10px; margin: 4px 0 18px; }
+  .contact-btn{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:13px 8px; border-radius:12px; border:1.5px solid var(--paper-line);
+    background:#fff; text-decoration:none; cursor:pointer; font-family:inherit;
+  }
+  .contact-btn:active{ transform:scale(0.96); }
+  .contact-btn.call{ color:var(--brass-deep); border-color:var(--brass-light); }
+  .contact-btn.whatsapp{ color:#1f8a4c; border-color:#bfe6cf; }
+  .contact-btn span{ font-size:0.74rem; font-weight:700; }
+
+  .instructions-box{
+    background: linear-gradient(180deg, #FBF9F4 0%, #F5F1E6 100%);
+    border:1px solid var(--paper-line); border-radius:14px; padding:16px;
+    margin-top:18px;
+  }
+  .instructions-title{
+    display:flex; align-items:center; gap:8px; font-family:'Bitter',serif; font-weight:700;
+    font-size:0.9rem; color:var(--ink-dark); margin-bottom:10px;
+  }
+  .instructions-box ul{ margin:0; padding-left:20px; }
+  .instructions-box li{ font-size:0.8rem; color:var(--text); line-height:1.7; }
+  .pa-item{ padding:10px 0; border-bottom:1px dashed var(--paper-line); }
+  .pa-item:last-child{ border-bottom:none; }
+  .pa-item-text{ font-size:0.82rem; color:var(--text); line-height:1.6; white-space:pre-wrap; }
+  .pa-item-date{ font-size:0.68rem; color:var(--muted); margin-top:5px; }
+  .pa-empty{ font-size:0.8rem; color:var(--muted); text-align:center; padding:6px 0; }
+  .payment-time{ font-size:0.62rem; color:var(--muted); display:block; }
+
+  footer{ text-align:center; font-size:0.7rem; color:var(--muted); margin-top:30px; padding: 0 20px; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo-header.png" alt="Logo" onerror="this.style.display='none'">
+  <h1>SHREE MAA NARMADA AUTO MOBILE'S &amp; TRAVELS</h1>
+  <p>Parent Fee Portal</p>
+</header>
+
+<div class="wrap">
+
+  <!-- Login -->
+  <div id="loginScreen">
+    <div class="login-card">
+      <div class="login-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </div>
+      <h2>Apna Fee Status Dekhein</h2>
+      <p>Apna registered mobile number daalein — jo humare paas van fee ke record mein darj hai.</p>
+      <div class="phone-input-row">
+        <span class="phone-prefix">+91</span>
+        <input type="tel" id="phoneInput" placeholder="10 digit number" maxlength="10" inputmode="numeric">
+      </div>
+      <button type="button" id="loginBtn">Dekhein</button>
+      <div id="loginLoading">Dhoond rahe hain…</div>
+      <div id="loginError"></div>
+    </div>
+    <div class="contact-note">
+      Number match nahi ho raha? Office se sampark karein:<br>
+      <a href="tel:7036407670">7036407670</a> · <a href="tel:7909407670">7909407670</a>
+    </div>
+  </div>
+
+  <!-- Multiple children picker -->
+  <div id="pickerScreen">
+    <div class="picker-title">Kis bachche ka fee status dekhna hai?</div>
+    <div id="pickerList"></div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashScreen">
+    <div class="back-row">
+      <button type="button" class="back-btn" id="backBtn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </button>
+      <div style="font-size:0.82rem;color:var(--muted);">Wapas jaayein</div>
+    </div>
+
+    <div class="student-head">
+      <img id="studentPhoto" class="student-photo" style="display:none;">
+      <div id="studentPhotoPlaceholder" class="student-photo-placeholder">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.3"/><path d="M5 20c0-3.4 3-6 7-6s7 2.6 7 6"/></svg>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div class="student-name"><span class="student-id-chip" id="studentIdChip">#1</span><span id="studentName">—</span></div>
+        <div class="student-sub" id="studentSub">—</div>
+      </div>
+      <div class="student-fee-pill">
+        <div class="student-fee-amt" id="studentFeeAmt">₹0</div>
+        <div class="student-fee-label">per month</div>
+      </div>
+    </div>
+
+    <div class="student-info-rows" id="studentInfoRows"></div>
+
+    <div class="student-card-body">
+      <div class="contact-btn-row">
+        <a href="tel:7036407670" class="contact-btn call">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>Call Karein</span>
+        </a>
+        <a href="#" class="contact-btn whatsapp" id="whatsappBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.9 11.9L4 20l4.2-1.1a7.9 7.9 0 0 0 3.85 1h0a7.94 7.94 0 0 0 5.55-13.58zm-5.55 12.2h0a6.58 6.58 0 0 1-3.36-.92l-.24-.14-2.5.65.67-2.44-.16-.25a6.6 6.6 0 1 1 5.6 3.1zm3.6-4.94c-.2-.1-1.17-.58-1.35-.64s-.31-.1-.44.1-.5.64-.61.77-.23.15-.42.05a5.4 5.4 0 0 1-1.6-.98 5.9 5.9 0 0 1-1.1-1.36c-.11-.2 0-.3.1-.4s.2-.24.3-.36a1.3 1.3 0 0 0 .2-.34.37.37 0 0 0 0-.35c-.05-.1-.44-1.06-.6-1.45s-.32-.33-.44-.33h-.38a.72.72 0 0 0-.53.25 2.2 2.2 0 0 0-.68 1.63 3.8 3.8 0 0 0 .8 2.03 8.7 8.7 0 0 0 3.33 2.94c.47.2.83.32 1.12.41a2.7 2.7 0 0 0 1.24.08c.38-.06 1.17-.48 1.33-.94a1.65 1.65 0 0 0 .12-.94c-.05-.08-.18-.13-.38-.23z"/></svg>
+          <span>WhatsApp</span>
+        </a>
+      </div>
+
+      <div class="due-banner" id="dueBanner">
+        <div>
+          <div class="due-label">Total Bakaya (Due)</div>
+          <div class="due-amount" id="dueAmount">₹0</div>
+        </div>
+        <svg id="dueIcon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--due);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+
+      <div class="section-label">Mahine ke Hisaab se Detail</div>
+      <table class="month-table">
+        <thead>
+          <tr><th>Mahina</th><th>Status</th><th>Paid</th><th>Due</th><th>Date</th></tr>
+        </thead>
+        <tbody id="monthTableBody"></tbody>
+      </table>
+
+      <div class="section-label" style="margin-top:20px;">Bills / Receipts</div>
+      <div id="billsList"></div>
+
+      <div class="section-label" style="margin-top:20px;">General Announcements</div>
+      <div class="instructions-box" id="announcementsBox">
+        <div id="parentAnnouncementsList"></div>
+      </div>
+
+      <div class="section-label" style="margin-top:20px;">Policy</div>
+      <div class="instructions-box">
+        <div class="instructions-title">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 0 1-5.8-1.6"/></svg>
+          आवश्यक सूचना — वैन फीस
+        </div>
+        <p style="font-size:0.82rem; color:var(--text); line-height:1.8; margin:0 0 12px;">
+          सभी अभिभावकों को सूचित किया जाता है कि वैन फीस शैक्षणिक सत्र में केवल 10 माह की ही ली जाएगी। वैन फीस में किसी भी प्रकार की छूट, कटौती या समायोजन नहीं किया जाएगा।
+        </p>
+        <p style="font-size:0.82rem; color:var(--text); line-height:1.8; margin:0 0 12px;">
+          वैन फीस का स्ट्रक्चर सभी बच्चों की संख्या एवं वैन के कुल खर्चों को ध्यान में रखकर निर्धारित किया जाता है, किसी एक बच्चे के आधार पर नहीं।
+        </p>
+        <p style="font-size:0.82rem; color:var(--text); line-height:1.8; margin:0 0 12px;">
+          यदि आपने अपने बच्चे के लिए वैन सेवा शुरू से ली है, तो पूरे शैक्षणिक सत्र की 10 माह की वैन फीस देय होगी। यदि कोई बच्चा बीच सत्र में वैन सुविधा लेना बंद कर देता है, तब भी शेष वैन फीस देय होगी।
+        </p>
+        <p style="font-size:0.82rem; color:var(--text); line-height:1.8; margin:0 0 12px;">
+          इसका कारण यह है कि वैन का फीस स्ट्रक्चर सत्र की शुरुआत में सभी बच्चों की संख्या और उनकी वैन सुविधा के आधार पर तय किया जाता है। बाद में किसी एक बच्चे द्वारा वैन सुविधा छोड़ने पर उस बच्चे की फीस का भार अन्य बच्चों पर नहीं डाला जा सकता।
+        </p>
+        <p style="font-size:0.82rem; color:var(--text); line-height:1.8; margin:0 0 12px;">
+          इसी प्रकार, यदि आपका बच्चा 10 दिन, 15 दिन या उससे अधिक समय तक स्कूल नहीं आता है, तब भी वैन फीस में किसी भी प्रकार की कमी नहीं की जाएगी और पूरी निर्धारित फीस देय होगी।
+        </p>
+        <p style="font-size:0.82rem; color:var(--text); line-height:1.8; margin:0 0 10px;">
+          अतः सभी अभिभावकों से अनुरोध है कि वैन फीस के इस नियम को समझते हुए पूरे सत्र की 10 माह की फीस समय पर जमा करें।
+        </p>
+        <p style="font-size:0.78rem; color:var(--muted); margin:10px 0 0; font-style:italic;">
+          धन्यवाद — वैन सेवा प्रबंधन
+        </p>
+
+        <div style="height:1px; background:var(--paper-line); margin:16px 0;"></div>
+
+        <div class="instructions-title" style="margin-bottom:8px;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 0 1-5.8-1.6"/></svg>
+          Important Notice — Van Fee
+        </div>
+        <p style="font-size:0.82rem; color:var(--text); line-height:1.8; margin:0 0 12px;">
+          Dear Parents, please be informed that the van fee will be charged for only 10 months during the academic session. There will be no discount, deduction, or adjustment of any kind in the van fee.
+        </p>
+        <p style="font-size:0.82rem; color:var(--text); line-height:1.8; margin:0 0 12px;">
+          The van fee structure is decided considering the total number of students using the van service and the overall expenses of the van, and not on the basis of any individual child.
+        </p>
+        <p style="font-size:0.82rem; color:var(--text); line-height:1.8; margin:0 0 12px;">
+          If you have opted for the van service for your child at the beginning of the academic session, the full van fee for the entire 10-month session will be payable. Even if you discontinue the van service in the middle of the session, the remaining van fee will still be payable.
+        </p>
+        <p style="font-size:0.82rem; color:var(--text); line-height:1.8; margin:0 0 12px;">
+          This is because the van fee structure is prepared at the beginning of the session based on the number of students using the van service at that time. If any student leaves the van service in the middle of the session, their fee cannot be added to or recovered from the fees of other students.
+        </p>
+        <p style="font-size:0.82rem; color:var(--text); line-height:1.8; margin:0 0 12px;">
+          Similarly, if your child remains absent from school for 10 days, 15 days, or more, there will be no reduction or adjustment in the van fee. The full applicable van fee will remain payable.
+        </p>
+        <p style="font-size:0.82rem; color:var(--text); line-height:1.8; margin:0 0 10px;">
+          Therefore, all parents are requested to kindly understand this policy and ensure that the full 10-month van fee is paid on time.
+        </p>
+        <p style="font-size:0.78rem; color:var(--muted); margin:10px 0 0; font-style:italic;">
+          Thank you for your cooperation — Van Service Management
+        </p>
+      </div>
+
+      <button type="button" id="payNowBtn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Fee Pay Karein
+      </button>
+      <div class="contact-note">Payment se koi dikkat ho to office se sampark karein:<br>
+        <a href="tel:7036407670">7036407670</a> · <a href="tel:7909407670">7909407670</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bill detail view overlay -->
+  <div id="billViewOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#fff; border-radius:16px; max-width:380px; width:100%; padding:22px; max-height:85vh; overflow-y:auto;">
+      <div id="billViewContent"></div>
+      <button type="button" id="closeBillViewBtn" style="width:100%; margin-top:16px; background:var(--paper); border:1px solid var(--paper-line); border-radius:10px; padding:11px; font-weight:600; cursor:pointer;">Band Karein</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  SHREE MAA NARMADA AUTO MOBILE'S &amp; TRAVELS<br>
+  Reg No: UDYAM-MP-32-0014395 · GSTIN: 23BORPR8040F1ZP
+</footer>
+
+<script>
+const FIREBASE_DB_URL = 'https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app';
+const MONTHS = ["Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr"];
+const MONTH_KEYS = ["07","08","09","10","11","12","01","02","03","04"];
+
+let state = { students: [], schools: [], vehicles: [], fees: {}, invoices: [], announcements: [] };
+let currentYear = getAcademicYearStart();
+let matchedStudents = [];
+
+function getAcademicYearStart(date){
+  date = date || new Date();
+  const m = date.getMonth() + 1;
+  const y = date.getFullYear();
+  return (m <= 4) ? (y - 1) : y;
+}
+function yearForMonth(mk){ return (parseInt(mk,10) >= 7) ? currentYear : (currentYear + 1); }
+function cleanPhone(phone){
+  if(!phone) return '';
+  let digits = String(phone).replace(/[^0-9]/g, '');
+  if(digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
+  return digits;
+}
+function feeKey(studentId, mk){ return studentId + '-' + yearForMonth(mk) + '-' + mk; }
+function paidAmountFor(studentId, mk){
+  const rec = state.fees[feeKey(studentId, mk)];
+  return rec ? Number(rec.amountPaid||0) : 0;
+}
+function paidDateFor(studentId, mk){
+  const rec = state.fees[feeKey(studentId, mk)];
+  return rec && rec.lastDate ? rec.lastDate : '';
+}
+function paidRecordedAtFor(studentId, mk){
+  const rec = state.fees[feeKey(studentId, mk)];
+  return rec && rec.recordedAt ? rec.recordedAt : '';
+}
+function formatDate(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return d.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+}
+// Shows day-of-week + date, and the time too when we have a precise
+// recorded timestamp (older payments only have a plain date, no time).
+function formatDateDayTime(dateOnly, recordedAt){
+  const source = recordedAt || dateOnly;
+  if(!source) return { line1:'—', line2:'' };
+  const d = new Date(source);
+  if(isNaN(d)) return { line1: dateOnly, line2:'' };
+  const line1 = d.toLocaleDateString('en-IN', { weekday:'short', day:'2-digit', month:'short', year:'numeric' });
+  const line2 = recordedAt ? d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }) : '';
+  return { line1, line2 };
+}
+function dueAmountForMonth(student, mk){
+  return Math.max(0, Number(student.fee||0) - paidAmountFor(student.id, mk));
+}
+function isMonthOverdue(mk){
+  const feeYear = yearForMonth(mk);
+  const feeMonth = parseInt(mk, 10);
+  const now = new Date();
+  const nowYear = now.getFullYear();
+  const nowMonth = now.getMonth() + 1;
+  if(nowYear > feeYear) return true;
+  if(nowYear === feeYear && nowMonth > feeMonth) return true;
+  return false;
+}
+function feeStatus(student, mk){
+  const fee = Number(student.fee||0);
+  const paidAmt = paidAmountFor(student.id, mk);
+  if(fee <= 0) return paidAmt > 0 ? 'paid' : (isMonthOverdue(mk) ? 'due' : 'upcoming');
+  if(paidAmt >= fee) return 'paid';
+  if(paidAmt > 0) return 'partial';
+  return isMonthOverdue(mk) ? 'due' : 'upcoming';
+}
+function schoolName(id){
+  const sc = state.schools.find(s=>s.id===id);
+  return sc ? sc.name : '';
+}
+function vehicleName(id){
+  const v = state.vehicles.find(v=>v.name===id || v.id===id);
+  return v ? v.name : '';
+}
+
+async function loadData(){
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}/data.json`);
+    const raw = await res.json();
+    if(raw && raw.value){
+      const parsed = JSON.parse(raw.value);
+      state.students = parsed.students || [];
+      state.schools = parsed.schools || [];
+      state.vehicles = parsed.vehicles || [];
+      state.fees = parsed.fees || {};
+      state.invoices = parsed.invoices || [];
+      state.announcements = parsed.announcements || [];
+    }
+  }catch(e){
+    console.error('Load failed', e);
+  }
+}
+
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const input = document.getElementById('phoneInput');
+  const errorEl = document.getElementById('loginError');
+  const loadingEl = document.getElementById('loginLoading');
+  errorEl.textContent = '';
+  const digits = input.value.replace(/[^0-9]/g,'');
+  if(digits.length !== 10){
+    errorEl.textContent = 'Kripya 10 digit ka sahi mobile number daalein.';
+    return;
+  }
+  loadingEl.style.display = 'block';
+  await loadData();
+  loadingEl.style.display = 'none';
+
+  matchedStudents = state.students.filter(s => cleanPhone(s.phone) === digits);
+  if(matchedStudents.length === 0){
+    errorEl.textContent = 'Is number se koi student nahi mila. Office se sampark karein.';
+    return;
+  }
+  if(matchedStudents.length === 1){
+    showDashboard(matchedStudents[0]);
+  } else {
+    showPicker(matchedStudents);
+  }
+});
+
+document.getElementById('phoneInput').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+
+function showPicker(students){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('pickerScreen').style.display = 'block';
+  document.getElementById('pickerList').innerHTML = students.map((s,i)=>`
+    <div class="picker-card" data-idx="${i}">
+      ${s.photo
+        ? `<img src="${s.photo}" class="picker-avatar">`
+        : `<div class="picker-avatar-placeholder">${(s.name||'?').charAt(0).toUpperCase()}</div>`}
+      <div>
+        <div class="picker-name">${s.name}</div>
+        <div class="picker-meta">${schoolName(s.schoolId)}${s.class ? ' · Class '+s.class : ''}</div>
+      </div>
+    </div>
+  `).join('');
+  document.querySelectorAll('.picker-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      showDashboard(students[Number(card.dataset.idx)]);
+    });
+  });
+}
+
+let currentStudent = null;
+
+function showDashboard(student){
+  currentStudent = student;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('pickerScreen').style.display = 'none';
+  document.getElementById('dashScreen').style.display = 'block';
+
+  if(student.photo){
+    document.getElementById('studentPhoto').src = student.photo;
+    document.getElementById('studentPhoto').style.display = 'block';
+    document.getElementById('studentPhotoPlaceholder').style.display = 'none';
+  } else {
+    document.getElementById('studentPhoto').style.display = 'none';
+    document.getElementById('studentPhotoPlaceholder').style.display = 'flex';
+  }
+  document.getElementById('studentName').textContent = student.name;
+  document.getElementById('studentSub').textContent =
+    [schoolName(student.schoolId), student.class ? 'Class '+student.class : '', vehicleName(student.vehicleId)].filter(Boolean).join(' · ');
+  const srNo = state.students.findIndex(s => s.id === student.id) + 1;
+  document.getElementById('studentIdChip').textContent = '#' + (srNo || 1);
+  document.getElementById('studentFeeAmt').textContent = '₹' + (student.fee || 0);
+
+  document.getElementById('studentInfoRows').innerHTML = [
+    student.schoolId ? `<div class="student-info-row"><span class="si-label">School</span><span class="si-value">${schoolName(student.schoolId)}</span></div>` : '',
+    student.parent ? `<div class="student-info-row"><span class="si-label">Parent</span><span class="si-value">${student.parent}</span></div>` : '',
+    student.phone ? `<div class="student-info-row"><span class="si-label">Phone</span><span class="si-value">${student.phone}</span></div>` : '',
+    student.village ? `<div class="student-info-row"><span class="si-label">Village</span><span class="si-value">${student.village}</span></div>` : ''
+  ].filter(Boolean).join('');
+
+  const waMsg = encodeURIComponent(`Namaste, main ${student.name} ke van fee ke bare mein baat karna chahta hoon.`);
+  document.getElementById('whatsappBtn').href = `https://wa.me/917036407670?text=${waMsg}`;
+
+  let totalDue = 0;
+  const tbody = document.getElementById('monthTableBody');
+  tbody.innerHTML = MONTH_KEYS.map((mk, i)=>{
+    const status = feeStatus(student, mk);
+    const paidAmt = paidAmountFor(student.id, mk);
+    const dueAmt = dueAmountForMonth(student, mk);
+    const payDate = paidDateFor(student.id, mk);
+    const payRecordedAt = paidRecordedAtFor(student.id, mk);
+    if(status === 'due' || status === 'partial') totalDue += dueAmt;
+    const statusLabel = status === 'paid' ? 'Paid' : status === 'partial' ? 'Half Paid' : status === 'due' ? 'Due' : 'Not Yet Due';
+    const dt = payDate ? formatDateDayTime(payDate, payRecordedAt) : null;
+    return `
+    <tr>
+      <td><b>${MONTHS[i]}</b> ${yearForMonth(mk)}</td>
+      <td><span class="mt-status ${status}">${statusLabel}</span></td>
+      <td class="mt-amount paid-col">${paidAmt > 0 ? '₹'+paidAmt : '—'}</td>
+      <td class="mt-amount due-col">${dueAmt > 0 ? '₹'+dueAmt : '—'}</td>
+      <td class="mt-date">${dt ? dt.line1 : '—'}${dt && dt.line2 ? `<span class="payment-time">${dt.line2}</span>` : ''}</td>
+    </tr>`;
+  }).join('');
+
+  const dueBanner = document.getElementById('dueBanner');
+  const dueIcon = document.getElementById('dueIcon');
+  document.getElementById('dueAmount').textContent = '₹' + totalDue;
+  if(totalDue > 0){
+    dueBanner.classList.remove('clear');
+    dueIcon.style.color = 'var(--due)';
+    dueIcon.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+  } else {
+    dueBanner.classList.add('clear');
+    dueIcon.style.color = 'var(--paid)';
+    dueIcon.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+  }
+
+  renderBills(student);
+  renderParentAnnouncements();
+
+  document.getElementById('payNowBtn').onclick = ()=>{
+    alert('Online payment jald hi shuru hoga. Abhi ke liye office se sampark karein:\n7036407670 / 7909407670');
+  };
+}
+
+function renderParentAnnouncements(){
+  const list = (state.announcements || []).slice().sort((a,b) => (a.date < b.date ? 1 : -1));
+  const el = document.getElementById('parentAnnouncementsList');
+  if(list.length === 0){
+    el.innerHTML = '<div class="pa-empty">Abhi koi naya announcement nahi hai.</div>';
+    return;
+  }
+  el.innerHTML = list.map(a => `
+    <div class="pa-item">
+      <div class="pa-item-text">${a.text}</div>
+      <div class="pa-item-date">${new Date(a.date).toLocaleDateString('en-IN', { weekday:'short', day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
+    </div>
+  `).join('');
+}
+
+function renderBills(student){
+  const bills = state.invoices
+    .filter(inv => inv.receiptType === 'fee' && inv.feeStudentId === student.id)
+    .sort((a,b) => (a.date < b.date ? 1 : -1));
+  const listEl = document.getElementById('billsList');
+  if(bills.length === 0){
+    listEl.innerHTML = '<div class="empty-note">Abhi tak koi bill nahi bana hai.</div>';
+    return;
+  }
+  listEl.innerHTML = bills.map((inv, idx) => `
+    <div class="bill-card">
+      <div class="bill-icon">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <div>
+        <div class="bill-no">${inv.invoiceNo || 'Bill'}</div>
+        <div class="bill-meta">${formatDate(inv.date)}</div>
+        <button type="button" class="bill-view-btn" data-idx="${idx}">Dekhein</button>
+      </div>
+      <div class="bill-amt">₹${inv.grandTotal||0}${inv.balanceDue > 0 ? `<br><span style="color:var(--due);font-size:0.68rem;">₹${inv.balanceDue} due</span>` : ''}</div>
+    </div>
+  `).join('');
+  listEl.querySelectorAll('.bill-view-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> showBillDetail(bills[Number(btn.dataset.idx)]));
+  });
+}
+
+function showBillDetail(inv){
+  const itemsHtml = (inv.items||[]).map(it => `
+    <tr>
+      <td style="padding:6px 0;">${it.description}</td>
+      <td style="padding:6px 0;text-align:right;font-family:'JetBrains Mono',monospace;">₹${it.rate}</td>
+    </tr>`).join('');
+  document.getElementById('billViewContent').innerHTML = `
+    <div style="text-align:center;margin-bottom:14px;">
+      <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.1rem;color:var(--ink-dark);">${inv.invoiceNo || 'Bill'}</div>
+      <div style="font-size:0.76rem;color:var(--muted);margin-top:2px;">${formatDate(inv.date)}</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;border-top:1px solid var(--paper-line);border-bottom:1px solid var(--paper-line);margin-bottom:12px;">
+      ${itemsHtml}
+    </table>
+    <div style="display:flex;justify-content:space-between;font-weight:700;font-size:0.95rem;color:var(--ink-dark);">
+      <span>Total</span><span style="font-family:'JetBrains Mono',monospace;">₹${inv.grandTotal||0}</span>
+    </div>
+    ${inv.balanceDue > 0 ? `<div style="display:flex;justify-content:space-between;color:var(--due);font-weight:700;margin-top:6px;font-size:0.85rem;"><span>Balance Due</span><span>₹${inv.balanceDue}</span></div>` : ''}
+  `;
+  document.getElementById('billViewOverlay').style.display = 'flex';
+}
+document.getElementById('closeBillViewBtn').addEventListener('click', ()=>{
+  document.getElementById('billViewOverlay').style.display = 'none';
+});
+
+
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  document.getElementById('dashScreen').style.display = 'none';
+  if(matchedStudents.length > 1){
+    document.getElementById('pickerScreen').style.display = 'block';
+  } else {
+    document.getElementById('loginScreen').style.display = 'block';
+    document.getElementById('phoneInput').value = '';
+  }
+});
+</script>
+</body>
+</html>
