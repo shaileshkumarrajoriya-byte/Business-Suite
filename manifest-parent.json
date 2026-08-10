@@ -1,0 +1,26 @@
+{
+  "id": "/parent-fee-portal",
+  "name": "Fee Portal - Shree Maa Narmada",
+  "short_name": "Fee Portal",
+  "description": "Parent Fee Portal for Shree Maa Narmada Auto Mobile's & Travels",
+  "start_url": "./parent.html",
+  "scope": "./parent.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF9F4",
+  "theme_color": "#0d1626",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
