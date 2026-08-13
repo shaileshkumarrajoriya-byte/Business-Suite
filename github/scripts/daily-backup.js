@@ -1,41 +1,28 @@
-// Runs inside GitHub Actions every day. Signs in to Firebase anonymously
-// (same way the app itself does), pulls every data key, and emails the
-// whole thing to your Gmail as a JSON attachment — a second, independent
-// backup that lives outside Firebase entirely.
-const https = require('https');
-const nodemailer = require('nodemailer');
+name: Daily Firebase Backup Email
 
-const FIREBASE_API_KEY = "AIzaSyDzABowWH-8LZrRhrIssvDhL4mfVT_DXOk";
-const FIREBASE_DB_URL = "https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app";
-const KEYS = ["data", "driverData", "expenseData", "loanData", "sharedVehicles"];
+on:
+  schedule:
+    - cron: '30 1 * * *'
+  workflow_dispatch: {}
 
-function fetchJson(url) {
-  return new Promise((resolve, reject) => {
-    https.get(url, res => {
-      let body = '';
-      res.on('data', d => body += d);
-      res.on('end', () => {
-        try { resolve(JSON.parse(body)); } catch (e) { reject(e); }
-      });
-    }).on('error', reject);
-  });
-}
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-function postJson(url, data) {
-  return new Promise((resolve, reject) => {
-    const body = JSON.stringify(data);
-    const req = https.request(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
-    }, res => {
-      let resBody = '';
-      res.on('data', d => resBody += d);
-      res.on('end', () => { try { resolve(JSON.parse(resBody)); } catch (e) { reject(e); } });
-    });
-    req.on('error', reject);
-    req.write(body);
-    req.end();
-  });
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install nodemailer
+
+      - name: Run backup and email
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: node .github/scripts/daily-backup.js  });
 }
 
 async function main() {
