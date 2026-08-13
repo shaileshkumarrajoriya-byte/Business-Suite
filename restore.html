@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAXON MOBILITY — Data Restore Tool</title>
+<style>
+  body{ font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:#0d1117; color:#e6edf3; margin:0; padding:20px; line-height:1.5; }
+  .card{ background:#161b22; border:1px solid #30363d; border-radius:12px; padding:20px; max-width:600px; margin:0 auto 16px; }
+  h1{ font-size:20px; margin:0 0 4px; }
+  h2{ font-size:15px; color:#8b949e; margin:0 0 16px; font-weight:normal; }
+  .warn{ background:#3d2b00; border:1px solid #9e6a03; color:#f0c674; padding:12px 14px; border-radius:8px; margin-bottom:16px; font-size:14px; }
+  .row{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #21262d; font-size:14px; }
+  .row:last-child{ border-bottom:none; }
+  .row b{ color:#7ee787; }
+  button{ width:100%; padding:14px; font-size:16px; font-weight:600; border:none; border-radius:8px; cursor:pointer; margin-top:10px; }
+  #restoreBtn{ background:#238636; color:#fff; }
+  #restoreBtn:disabled{ background:#30363d; color:#8b949e; }
+  #cancelBtn{ background:#21262d; color:#e6edf3; border:1px solid #30363d; }
+  #status{ margin-top:16px; font-size:14px; white-space:pre-wrap; }
+  .ok{ color:#7ee787; }
+  .err{ color:#ff7b72; }
+  .step{ color:#8b949e; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>⚠️ One-Time Data Restore</h1>
+  <h2>DAXON MOBILITY Business Suite — Firebase Realtime Database</h2>
+
+  <div class="warn">
+    Ye tool aapके Firebase database ke <b>data</b>, <b>driverData</b>, <b>expenseData</b>,
+    <b>loanData</b> aur <b>sharedVehicles</b> keys ko <b>poori tarah overwrite</b> karегa,
+    is backup file ki content se. Ye action undo nahi ho sakta.
+  </div>
+
+  <div id="preview">Loading backup file…</div>
+
+  <button id="restoreBtn" disabled>Loading…</button>
+  <button id="cancelBtn" onclick="window.location.href='/'">Cancel — Home par jaayein</button>
+
+  <div id="status"></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDzABowWH-8LZrRhrIssvDhL4mfVT_DXOk",
+    authDomain: "van-register.firebaseapp.com",
+    databaseURL: "https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "van-register",
+    storageBucket: "van-register.firebasestorage.app",
+    messagingSenderId: "89738000508",
+    appId: "1:89738000508:web:1ef2cbd3093dcb273131f9"
+  };
+  const FIREBASE_DB_URL = firebaseConfig.databaseURL;
+
+  const fbApp = initializeApp(firebaseConfig);
+  const fbAuth = getAuth(fbApp);
+
+  const authReady = new Promise((resolve, reject)=>{
+    let settled = false;
+    onAuthStateChanged(fbAuth, (user)=>{ if(user && !settled){ settled = true; resolve(user); } });
+    signInAnonymously(fbAuth).catch(e=>{ if(!settled){ settled = true; reject(e); } });
+    setTimeout(()=>{ if(!settled){ settled = true; reject(new Error('Auth timed out')); } }, 15000);
+  });
+
+  async function authedFetch(url, options){
+    const user = await authReady;
+    const token = await user.getIdToken();
+    const sep = url.includes('?') ? '&' : '?';
+    return fetch(`${url}${sep}auth=${token}`, options);
+  }
+
+  const statusEl = document.getElementById('status');
+  const restoreBtn = document.getElementById('restoreBtn');
+  const previewEl = document.getElementById('preview');
+
+  function log(msg, cls){
+    const line = document.createElement('div');
+    if(cls) line.className = cls;
+    line.textContent = msg;
+    statusEl.appendChild(line);
+  }
+
+  let backup = null;
+
+  async function loadBackup(){
+    try{
+      const res = await fetch('./backup-data.json');
+      if(!res.ok) throw new Error('backup-data.json not found (status ' + res.status + ')');
+      backup = await res.json();
+      const d = backup.data || {};
+      const dr = backup.driverData || {};
+      const ex = backup.expenseData || {};
+      previewEl.innerHTML = `
+        <div class="row"><span>Students</span><b>${(d.students||[]).length}</b></div>
+        <div class="row"><span>Vehicles</span><b>${(d.vehicles||[]).length}</b></div>
+        <div class="row"><span>Schools</span><b>${(d.schools||[]).length}</b></div>
+        <div class="row"><span>Fee records</span><b>${Object.keys(d.fees||{}).length}</b></div>
+        <div class="row"><span>Invoices</span><b>${(d.invoices||[]).length}</b></div>
+        <div class="row"><span>Drivers</span><b>${(dr.drivers||[]).length}</b></div>
+        <div class="row"><span>Expenses</span><b>${(ex.expenses||[]).length}</b></div>
+      `;
+      restoreBtn.disabled = false;
+      restoreBtn.textContent = 'Restore This Data to Firebase';
+    }catch(e){
+      previewEl.innerHTML = '';
+      log('❌ Backup file load nahi ho saki: ' + e.message, 'err');
+      restoreBtn.textContent = 'Backup file missing';
+    }
+  }
+
+  async function putKey(key, value){
+    const res = await authedFetch(`${FIREBASE_DB_URL}/${key}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value: JSON.stringify(value) })
+    });
+    if(!res.ok) throw new Error(`${key} save failed (status ${res.status})`);
+  }
+
+  restoreBtn.addEventListener('click', async ()=>{
+    if(!backup) return;
+    const sure = confirm('Pakka? Ye Firebase ke current (khali) data ko is backup se replace kar dega. Wapas undo nahi ho sakta.');
+    if(!sure) return;
+
+    restoreBtn.disabled = true;
+    cancelBtn.disabled = true;
+    statusEl.innerHTML = '';
+    log('Firebase se connect ho raha hai…', 'step');
+
+    try{
+      await authReady;
+      log('✅ Connected', 'ok');
+
+      const keys = ['data','driverData','expenseData','loanData','sharedVehicles'];
+      for(const key of keys){
+        if(backup[key] === undefined){ log(`⏭️ Skipping ${key} (backup mein nahi mila)`, 'step'); continue; }
+        log(`Saving ${key}…`, 'step');
+        await putKey(key, backup[key]);
+        log(`✅ ${key} restored`, 'ok');
+      }
+
+      log('', '');
+      log('🎉 Restore complete! Aapका data wapas aa gaya hai.', 'ok');
+      log('Ab app kholiye aur Students tab check kariye.', 'ok');
+      log('', '');
+      log('⚠️ Is file (restore.html aur backup-data.json) ko ab repo se DELETE kar dijiye — isमें students ka personal data hai.', 'err');
+      restoreBtn.textContent = 'Done';
+    }catch(e){
+      log('❌ Error: ' + e.message, 'err');
+      restoreBtn.disabled = false;
+      restoreBtn.textContent = 'Retry Restore';
+      cancelBtn.disabled = false;
+    }
+  });
+
+  loadBackup();
+</script>
+
+</body>
+</html>
