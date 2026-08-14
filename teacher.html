@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0F2A5C">
+<link rel="manifest" href="manifest-teacher.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Teacher Portal">
+<title>Teacher Portal — DAXON MOBILITY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-dark: #0F2A5C;
+    --paper: #FBF9F4;
+    --paper-line: #E7E1D3;
+    --brass: #D4AF37;
+    --brass-deep: #A8791C;
+    --brass-light: #F0D687;
+    --paid: #3F7859;
+    --warn: #96650F;
+    --warn-bg: #FCEFD9;
+    --text: #2B2E33;
+    --muted: #6B7280;
+    --shadow-card: 0 1px 2px rgba(20,15,5,0.05), 0 14px 32px rgba(20,15,5,0.09);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body{ height:100%; margin:0; }
+  body{
+    background: var(--paper); color: var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    padding-bottom: 30px;
+  }
+  .wrap{ max-width:440px; margin:0 auto; padding: 0 16px; }
+  header{
+    position:relative;
+    background: linear-gradient(165deg, #17203a 0%, #0F2A5C 55%, #081833 100%);
+    color:#fff; padding: 40px 24px 46px; text-align:center;
+    border-bottom: 3px solid var(--brass);
+  }
+  header::after{
+    content:''; position:absolute; inset:0; pointer-events:none; opacity:0.06;
+    background-image: repeating-linear-gradient(135deg, #fff 0 2px, transparent 2px 14px);
+  }
+  header img{ height:56px; width:auto; margin-bottom:12px; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.35)); border-radius:12px; position:relative; z-index:2; }
+  header h1{ font-family:'Bitter',serif; font-size:1.3rem; margin:0; font-weight:800; position:relative; z-index:2; }
+  header p{ margin:4px 0 0; font-size:0.8rem; color:#C9D4E8; position:relative; z-index:2; }
+  .lang-toggle-btn{
+    position:absolute; top:14px; right:14px;
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:#fff;
+    font-size:0.7rem; font-weight:700; padding:6px 10px; border-radius:20px; cursor:pointer;
+  }
+  .install-toggle-btn{
+    position:absolute; top:14px; left:14px;
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:#fff;
+    width:30px; height:30px; border-radius:50%; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .card{ background:#fff; border:1px solid var(--paper-line); border-radius:16px; padding:20px; margin-top:-30px; position:relative; z-index:5; box-shadow:var(--shadow-card); }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:0.78rem; font-weight:600; color:var(--muted); margin-bottom:6px; }
+  .field input{
+    width:100%; padding:13px 14px; border:1.5px solid var(--paper-line); border-radius:12px;
+    font-size:1rem; font-family:inherit; box-sizing:border-box;
+  }
+  .field input:focus{ outline:none; border-color:var(--brass); }
+  .btn-primary{
+    width:100%; padding:14px; background:linear-gradient(160deg,var(--brass-light),var(--brass-deep));
+    color:#2A2114; border:none; border-radius:12px; font-weight:700; font-size:1rem; cursor:pointer;
+  }
+  .btn-primary:active{ transform:scale(0.98); }
+  .error-text{ color:#B23B31; font-size:0.82rem; margin-top:8px; text-align:center; }
+
+  .section-label{ font-size:0.72rem; font-weight:700; letter-spacing:1.5px; color:var(--brass-deep); text-transform:uppercase; margin: 20px 0 12px; }
+  .info-rows{ background:#fff; border:1px solid var(--paper-line); border-radius:14px; padding:14px 16px; }
+  .info-row{ display:flex; align-items:flex-start; gap:8px; font-size:0.85rem; padding:6px 0; border-bottom:1px dashed var(--paper-line); }
+  .info-row:last-child{ border-bottom:none; }
+  .info-row .lbl{ color:var(--muted); min-width:64px; flex-shrink:0; font-size:0.72rem; padding-top:1px; }
+  .info-row .val{ flex:1; font-weight:600; color:var(--ink-dark); }
+  .info-row .val a{ color:var(--ink-dark); }
+
+  .call-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; margin-top:10px; padding:12px; background:var(--paid); color:#fff;
+    border-radius:12px; text-decoration:none; font-weight:700; font-size:0.9rem;
+  }
+
+  .delay-banner{
+    display:none; background:var(--warn-bg); border:1.5px solid #E8CE7A; border-radius:14px;
+    padding:14px 16px; margin-top:16px; gap:10px; align-items:flex-start;
+  }
+  .delay-banner .dtext{ font-size:0.8rem; color:#7a5209; margin-top:2px; line-height:1.5; }
+  .delay-banner .dtitle{ font-weight:700; color:var(--warn); font-size:0.86rem; }
+
+  .announce-item{ background:#fff; border:1px solid var(--paper-line); border-radius:12px; padding:12px 14px; margin-bottom:8px; }
+  .announce-item .a-text{ font-size:0.86rem; color:var(--text); line-height:1.5; }
+  .announce-item .a-date{ font-size:0.7rem; color:var(--muted); margin-top:6px; }
+  .empty-note{ font-size:0.82rem; color:var(--muted); text-align:center; padding:14px 0; }
+
+  .back-link{ display:block; text-align:center; margin-top:22px; color:var(--muted); font-size:0.82rem; text-decoration:none; }
+
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:999;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay .modal-card{ background:#fff; border-radius:16px; max-width:400px; width:100%; padding:22px; }
+  .modal-close-btn{
+    width:100%; margin-top:16px; background:var(--paper); border:1px solid var(--paper-line);
+    border-radius:10px; padding:11px; font-weight:600; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button type="button" id="installBtn" class="install-toggle-btn" aria-label="Install App" style="display:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+  <img src="logo-header.png" alt="Logo" onerror="this.style.display='none'">
+  <h1>DAXON MOBILITY</h1>
+  <p>Teacher Portal</p>
+</header>
+
+<div class="wrap">
+
+  <div class="card" id="loginScreen">
+    <div class="field">
+      <label>Mobile Number</label>
+      <input type="tel" id="phoneInput" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric">
+    </div>
+    <button type="button" class="btn-primary" id="loginBtn">Login</button>
+    <div class="error-text" id="loginError"></div>
+  </div>
+
+  <div class="card" id="pickerScreen" style="display:none;">
+    <div class="field"><label>Multiple accounts found — select yours</label></div>
+    <div id="pickerList"></div>
+  </div>
+
+  <div id="dashScreen" style="display:none;">
+    <div class="card">
+      <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.15rem;color:var(--ink-dark);" id="teacherName">—</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-top:2px;" id="teacherSub"></div>
+
+      <div class="delay-banner" id="delayAlertBanner">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#96650F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div>
+          <div class="dtitle">Van Delayed</div>
+          <div class="dtext" id="delayAlertText"></div>
+        </div>
+      </div>
+
+      <div class="section-label">Driver</div>
+      <div class="info-rows" id="driverInfoRows">
+        <div class="empty-note">Koi driver assign nahi hai abhi.</div>
+      </div>
+
+      <div class="section-label">Route</div>
+      <div class="info-rows" id="routeInfoRows">
+        <div class="empty-note">Koi route fix nahi hai abhi.</div>
+      </div>
+
+      <div class="section-label">Announcements</div>
+      <div id="announcementsList"></div>
+
+      <a href="#" class="back-link" id="backBtn">← Log out</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="installOverlay">
+  <div class="modal-card">
+    <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.05rem;color:var(--ink-dark);margin-bottom:14px;">Install App</div>
+    <div style="font-size:0.86rem;color:var(--text);line-height:1.7;">
+      Is portal ko apne phone ki Home Screen par ek app ki tarah add karein:<br><br>
+      <b>Android (Chrome):</b> Upar-right corner mein <b>⋮</b> (teen dot) menu par tap karein, phir <b>"Add to Home screen"</b> ya <b>"Install app"</b> choose karein.<br><br>
+      <b>iPhone (Safari):</b> Neeche Share icon <b>⬆</b> par tap karein, phir <b>"Add to Home Screen"</b> choose karein.
+    </div>
+    <button type="button" id="installOverlayClose" class="modal-close-btn">Got it</button>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDzABowWH-8LZrRhrIssvDhL4mfVT_DXOk",
+    authDomain: "van-register.firebaseapp.com",
+    databaseURL: "https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "van-register",
+    storageBucket: "van-register.firebasestorage.app",
+    messagingSenderId: "89738000508",
+    appId: "1:89738000508:web:1ef2cbd3093dcb273131f9"
+  };
+  const fbApp = initializeApp(firebaseConfig);
+  const fbAuth = getAuth(fbApp);
+
+  window.__firebaseAuthReady = new Promise((resolve, reject)=>{
+    let settled = false;
+    onAuthStateChanged(fbAuth, (user)=>{ if(user && !settled){ settled = true; resolve(user); } });
+    signInAnonymously(fbAuth).catch(e=>{
+      console.error('Firebase anonymous sign-in failed:', e);
+      if(!settled){ settled = true; reject(e); }
+    });
+    setTimeout(()=>{
+      if(!settled){ settled = true; reject(new Error('Firebase auth timed out')); }
+    }, 30000);
+  });
+
+  window.getFirebaseAuthToken = async function(){
+    const user = await window.__firebaseAuthReady;
+    return await user.getIdToken();
+  };
+
+  window.authedFetch = async function(url, options){
+    const token = await window.getFirebaseAuthToken();
+    const sep = url.includes('?') ? '&' : '?';
+    return fetch(`${url}${sep}auth=${token}`, options);
+  };
+</script>
+<script>
+
+// ---------- Slow-network safety: wait for the Firebase auth helper ----------
+async function waitForAuthedFetch(timeoutMs){
+  timeoutMs = timeoutMs || 15000;
+  const start = Date.now();
+  while(typeof window.authedFetch !== 'function'){
+    if(Date.now() - start > timeoutMs){
+      throw new Error('Firebase script did not finish loading (slow/no internet)');
+    }
+    await new Promise(r => setTimeout(r, 100));
+  }
+  return window.authedFetch;
+}
+
+const FIREBASE_DB_URL = 'https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+let state = { teachers: [], vehicles: [], announcements: [], drivers: [], routes: [], delayUpdates: [] };
+let currentTeacher = null;
+let matchedTeachers = [];
+
+async function loadData(){
+  try{
+    const res = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/data.json`);
+    const raw = await res.json();
+    if(raw && raw.value){
+      const parsed = JSON.parse(raw.value);
+      state.teachers = parsed.teachers || [];
+      state.vehicles = parsed.vehicles || [];
+      state.announcements = parsed.announcements || [];
+    }
+  }catch(e){
+    console.error('Load failed', e);
+    throw e;
+  }
+  try{
+    const res2 = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/driverData.json`);
+    const raw2 = await res2.json();
+    if(raw2 && raw2.value){
+      const parsed2 = JSON.parse(raw2.value);
+      state.drivers = parsed2.drivers || [];
+      state.routes = parsed2.routes || [];
+      state.delayUpdates = parsed2.delayUpdates || [];
+    }
+  }catch(e){
+    console.log('Driver info load failed (non-fatal):', e);
+  }
+}
+
+function driverForVehicle(vehicleIdOrName){
+  if(!vehicleIdOrName) return null;
+  const v = state.vehicles.find(v=>v.name===vehicleIdOrName || v.id===vehicleIdOrName);
+  const matchKeys = v ? [v.id, v.name] : [vehicleIdOrName];
+  return (state.drivers || []).find(d => matchKeys.includes(d.vehicleId)) || null;
+}
+
+function routesForVehicle(vehicleIdOrName){
+  if(!vehicleIdOrName) return [];
+  const v = state.vehicles.find(v=>v.name===vehicleIdOrName || v.id===vehicleIdOrName);
+  const matchKeys = v ? [v.id, v.name] : [vehicleIdOrName];
+  return (state.routes || []).filter(r => matchKeys.includes(r.vehicleId));
+}
+
+function formatTime12h(t){
+  const parts = String(t).split(':');
+  if(parts.length < 2) return t;
+  let h = Number(parts[0]);
+  const m = parts[1];
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12; if(h === 0) h = 12;
+  return `${h}:${m} ${ampm}`;
+}
+
+function timeAgo(isoString){
+  const diffMin = Math.max(0, Math.floor((Date.now() - new Date(isoString).getTime()) / 60000));
+  if(diffMin < 1) return 'abhi';
+  if(diffMin < 60) return diffMin + ' min pehle';
+  const diffHr = Math.floor(diffMin / 60);
+  return diffHr + ' ghante pehle';
+}
+
+function showDashboard(teacher){
+  currentTeacher = teacher;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('pickerScreen').style.display = 'none';
+  document.getElementById('dashScreen').style.display = 'block';
+
+  document.getElementById('teacherName').textContent = teacher.name;
+  const veh = state.vehicles.find(v=>v.id===teacher.vehicleId || v.name===teacher.vehicleId);
+  document.getElementById('teacherSub').textContent = veh ? veh.name : '';
+
+  // Delay alert
+  const banner = document.getElementById('delayAlertBanner');
+  const recentDelay = (state.delayUpdates || [])
+    .filter(u => u.vehicleId && teacher.vehicleId && u.vehicleId === teacher.vehicleId)
+    .filter(u => (Date.now() - new Date(u.createdAt).getTime()) < 3*60*60*1000)
+    .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+  if(recentDelay){
+    document.getElementById('delayAlertText').textContent =
+      `${recentDelay.reason} — ${recentDelay.driverName || 'Driver'} ne bataya, ${timeAgo(recentDelay.createdAt)}`;
+    banner.style.display = 'flex';
+  } else {
+    banner.style.display = 'none';
+  }
+
+  // Driver info
+  const driver = driverForVehicle(teacher.vehicleId);
+  const driverRows = document.getElementById('driverInfoRows');
+  if(driver){
+    driverRows.innerHTML = `
+      <div class="info-row"><span class="lbl">Name</span><span class="val">${driver.name}</span></div>
+      ${driver.phone ? `<div class="info-row"><span class="lbl">Phone</span><span class="val"><a href="tel:${driver.phone}">${driver.phone}</a></span></div>` : ''}
+    ` + (driver.phone ? `<a class="call-btn" href="tel:${driver.phone}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Call Driver
+    </a>` : '');
+  } else {
+    driverRows.innerHTML = '<div class="empty-note">Koi driver assign nahi hai abhi.</div>';
+  }
+
+  // Route info
+  const routes = routesForVehicle(teacher.vehicleId);
+  const routeRows = document.getElementById('routeInfoRows');
+  if(routes.length > 0){
+    routeRows.innerHTML = routes.map(r => `
+      <div style="margin-bottom:10px;">
+        <div style="font-weight:700;color:var(--ink-dark);font-family:'Bitter',serif;margin-bottom:6px;">${r.name || 'Route'}</div>
+        ${(r.stops||[]).map((s,i)=>`
+          <div class="info-row"><span class="lbl">${i+1}. ${s.name}</span><span class="val" style="text-align:right;">${s.time ? formatTime12h(s.time) : ''}</span></div>
+        `).join('')}
+      </div>
+    `).join('');
+  } else {
+    routeRows.innerHTML = '<div class="empty-note">Koi route fix nahi hai abhi.</div>';
+  }
+
+  // Announcements
+  const list = (state.announcements || []).slice().sort((a,b) => (a.date < b.date ? 1 : -1));
+  const annEl = document.getElementById('announcementsList');
+  if(list.length === 0){
+    annEl.innerHTML = '<div class="empty-note">Koi announcement nahi hai.</div>';
+  } else {
+    annEl.innerHTML = list.map(a => `
+      <div class="announce-item">
+        <div class="a-text">${a.text}</div>
+        <div class="a-date">${new Date(a.date).toLocaleDateString('en-IN', { weekday:'short', day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
+      </div>
+    `).join('');
+  }
+}
+
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const phone = document.getElementById('phoneInput').value.trim();
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  if(!/^\d{10}$/.test(phone)){
+    errEl.textContent = 'Kripya 10 ankon ka sahi mobile number daalein.';
+    return;
+  }
+  document.getElementById('loginBtn').textContent = 'Searching…';
+  document.getElementById('loginBtn').disabled = true;
+  try{
+    await loadData();
+    matchedTeachers = state.teachers.filter(t => (t.phone||'').replace(/\D/g,'').slice(-10) === phone);
+    if(matchedTeachers.length === 0){
+      errEl.textContent = 'Ye number kisi teacher se match nahi hua. Office se sampark karein.';
+    } else if(matchedTeachers.length === 1){
+      showDashboard(matchedTeachers[0]);
+    } else {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('pickerScreen').style.display = 'block';
+      document.getElementById('pickerList').innerHTML = matchedTeachers.map((t,i) => `
+        <button type="button" class="btn-primary" style="margin-bottom:10px;" onclick="window.__pickTeacher(${i})">${t.name}</button>
+      `).join('');
+      window.__pickTeacher = (i)=> showDashboard(matchedTeachers[i]);
+    }
+  }catch(e){
+    errEl.textContent = '⚠️ Internet check karke dobara koshish karein.';
+  }
+  document.getElementById('loginBtn').textContent = 'Login';
+  document.getElementById('loginBtn').disabled = false;
+});
+
+document.getElementById('backBtn').addEventListener('click', (e)=>{
+  e.preventDefault();
+  document.getElementById('dashScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'block';
+  document.getElementById('phoneInput').value = '';
+});
+
+// ---------- Install App (Add to Home Screen) ----------
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(e=>console.log('Service worker registration failed:', e));
+}
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('installBtn').style.display = 'flex';
+});
+window.addEventListener('appinstalled', ()=>{
+  document.getElementById('installBtn').style.display = 'none';
+});
+const isStandaloneTeacher = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+if(!isStandaloneTeacher){
+  setTimeout(()=>{
+    if(document.getElementById('installBtn').style.display === 'none'){
+      document.getElementById('installBtn').style.display = 'flex';
+    }
+  }, 800);
+}
+document.getElementById('installBtn').addEventListener('click', async ()=>{
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+  } else {
+    document.getElementById('installOverlay').style.display = 'flex';
+  }
+});
+document.getElementById('installOverlayClose').addEventListener('click', ()=>{
+  document.getElementById('installOverlay').style.display = 'none';
+});
+</script>
+</body>
+</html>
