@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F2A5C">
+<title>Teacher Portal Guide — DAXON MOBILITY</title>
+<meta name="description" content="How to register, log in, and use the DAXON MOBILITY Teacher Portal.">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-dark: #0F2A5C;
+    --paper: #FBF9F4;
+    --paper-line: #E7E1D3;
+    --brass: #D4AF37;
+    --brass-deep: #A8791C;
+    --brass-light: #F0D687;
+    --paid: #3F7859;
+    --warn: #96650F;
+    --warn-bg: #FCEFD9;
+    --text: #2B2E33;
+    --muted: #6B7280;
+    --shadow-card: 0 1px 2px rgba(20,15,5,0.05), 0 14px 32px rgba(20,15,5,0.09);
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--paper); color:var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,.brand{ font-family:'Bitter',serif; }
+  .wrap{ max-width:640px; margin:0 auto; padding:0 20px 40px; }
+
+  header{
+    position:relative;
+    background: linear-gradient(165deg, #17203a 0%, #0F2A5C 55%, #081833 100%);
+    color:#fff; padding:36px 20px 44px; text-align:center;
+    border-bottom:3px solid var(--brass);
+  }
+  header::after{
+    content:''; position:absolute; inset:0; pointer-events:none; opacity:0.06;
+    background-image: repeating-linear-gradient(135deg, #fff 0 2px, transparent 2px 14px);
+  }
+  header img{ height:52px; width:auto; margin-bottom:10px; border-radius:12px; position:relative; z-index:2; filter:drop-shadow(0 6px 16px rgba(0,0,0,0.35)); }
+  header h1{ font-size:1.4rem; margin:0; font-weight:800; position:relative; z-index:2; }
+  header p{ margin:4px 0 0; font-size:0.85rem; color:var(--brass-light); font-weight:600; letter-spacing:0.04em; position:relative; z-index:2; }
+
+  .cta-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:16px; padding:20px;
+    margin-top:-26px; position:relative; z-index:5; box-shadow:var(--shadow-card); text-align:center;
+  }
+  .cta-card p{ font-size:0.86rem; color:var(--muted); margin:0 0 14px; }
+  .btn-open{
+    display:inline-flex; align-items:center; gap:8px; width:100%; justify-content:center;
+    padding:14px; background:linear-gradient(160deg,var(--brass-light),var(--brass-deep));
+    color:#2A2114; border-radius:12px; text-decoration:none; font-weight:700; font-size:0.95rem;
+    box-sizing:border-box;
+  }
+
+  section{ margin-top:30px; }
+  .step-num{
+    display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px;
+    border-radius:50%; background:var(--ink-dark); color:var(--brass-light); font-family:'JetBrains Mono',monospace;
+    font-weight:700; font-size:0.8rem; flex:none;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.12em;
+    text-transform:uppercase; color:var(--brass-deep); margin-bottom:6px; display:block;
+  }
+  h2{ font-size:1.15rem; color:var(--ink-dark); margin:0 0 12px; font-weight:800; }
+  .step-row{ display:flex; gap:12px; margin-bottom:14px; align-items:flex-start; }
+  .step-row .txt{ font-size:0.9rem; line-height:1.55; padding-top:2px; }
+  .step-row .txt b{ color:var(--ink-dark); }
+  .note{
+    background:var(--warn-bg); border:1px solid #E8CE7A; border-radius:10px; padding:10px 14px;
+    font-size:0.82rem; color:var(--warn); margin-top:10px;
+  }
+
+  .feature-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:14px; padding:16px;
+    margin-bottom:10px; display:flex; gap:12px; align-items:flex-start;
+  }
+  .feature-card .ic{
+    flex:none; width:36px; height:36px; border-radius:10px; background:var(--paper);
+    border:1px solid var(--paper-line); display:flex; align-items:center; justify-content:center; color:var(--brass-deep);
+  }
+  .feature-card h3{ margin:0 0 3px; font-size:0.92rem; color:var(--ink-dark); font-family:'Inter',sans-serif; font-weight:700; }
+  .feature-card p{ margin:0; font-size:0.82rem; color:var(--muted); line-height:1.5; }
+
+  .contact-card{
+    background:var(--ink-dark); color:#fff; border-radius:16px; padding:20px; text-align:center;
+  }
+  .contact-card p{ font-size:0.85rem; color:#C9D4E8; margin:0 0 12px; }
+  .contact-card a{
+    display:inline-block; color:#fff; font-weight:700; text-decoration:none; font-size:1.05rem;
+    background:rgba(255,255,255,0.1); padding:10px 20px; border-radius:10px; border:1px solid rgba(255,255,255,0.25);
+  }
+
+  footer{ text-align:center; margin-top:34px; font-size:0.76rem; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo-header.png" alt="Logo" onerror="this.style.display='none'">
+  <h1>DAXON MOBILITY</h1>
+  <p>TEACHER PORTAL — USER GUIDE</p>
+</header>
+
+<div class="wrap">
+  <div class="cta-card">
+    <p>Portal seedhe yahan se kholiye:</p>
+    <a class="btn-open" href="teacher.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Open Teacher Portal
+    </a>
+  </div>
+
+  <section>
+    <span class="eyebrow">Step 1</span>
+    <h2>Registration (Pehli Baar)</h2>
+    <div class="step-row"><span class="step-num">1</span><div class="txt">Teacher Portal kholiye (upar wale button se)</div></div>
+    <div class="step-row"><span class="step-num">2</span><div class="txt"><b>"New teacher? Register here"</b> par tap kariye</div></div>
+    <div class="step-row"><span class="step-num">3</span><div class="txt">Apna naam, mobile number, school (agar pata ho), aur kaunsi van mein aap travel karte hain — ye sab bharein</div></div>
+    <div class="step-row"><span class="step-num">4</span><div class="txt"><b>"Submit Registration"</b> dabaiye</div></div>
+    <div class="note">Registration bhejne ke baad office aapki details verify karega. Jab tak verify na ho, login nahi hoga — thoda intezaar karein.</div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Step 2</span>
+    <h2>Login Kaise Karein</h2>
+    <div class="step-row"><span class="step-num">1</span><div class="txt">Teacher Portal kholiye</div></div>
+    <div class="step-row"><span class="step-num">2</span><div class="txt">Apna 10 ankon ka mobile number daalein (wahi jo registration mein diya tha)</div></div>
+    <div class="step-row"><span class="step-num">3</span><div class="txt"><b>"Login"</b> button dabaiye</div></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">What's inside</span>
+    <h2>Portal Mein Kya-Kya Milega</h2>
+    <div class="feature-card">
+      <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+      <div><h3>Driver Ki Jaankari</h3><p>Van chalane wale driver ka naam aur number — ek tap mein call kar sakte hain.</p></div>
+    </div>
+    <div class="feature-card">
+      <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+      <div><h3>Van Ka Route Aur Time</h3><p>Kis-kis stop se hoti hui van jayegi, aur har stop ka time — order mein.</p></div>
+    </div>
+    <div class="feature-card">
+      <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div><h3>Delay Alerts</h3><p>Van late ho to driver ka bheja hua update aur wajah, turant dikhta hai.</p></div>
+    </div>
+    <div class="feature-card">
+      <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 0 1-5.8-1.6"/></svg></div>
+      <div><h3>Announcements</h3><p>School ya office ki koi bhi jaroori suchna yahin dikhegi.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Optional</span>
+    <h2>App Ko Phone Mein Install Karna</h2>
+    <div class="step-row"><span class="step-num">1</span><div class="txt">Portal ke upar-left corner mein download icon par tap kariye</div></div>
+    <div class="step-row"><span class="step-num">2</span><div class="txt">Screen par diye steps follow kariye — Android par seedha install; iPhone par Share button se <b>"Add to Home Screen"</b></div></div>
+  </section>
+
+  <section>
+    <div class="contact-card">
+      <span class="eyebrow" style="color:var(--brass-light);">Madad chahiye?</span>
+      <p>Login na ho paye, jaankari galat dikhe, ya kuch aur — office se seedhe sampark karein.</p>
+      <a href="tel:+917036407670">📞 70364 07670</a>
+    </div>
+  </section>
+
+  <footer>DAXON MOBILITY &middot; Barman, Madhya Pradesh</footer>
+</div>
+
+</body>
+</html>
