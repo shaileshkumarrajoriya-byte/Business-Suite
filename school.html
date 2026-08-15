@@ -333,7 +333,9 @@ document.getElementById('loginBtn').addEventListener('click', async ()=>{
   document.getElementById('loginBtn').disabled = true;
   try{
     await loadData();
-    const school = state.schools.find(sc => (sc.phone||'').replace(/\D/g,'').slice(-10) === phone);
+    const school = state.schools.find(sc =>
+      (sc.phone||'').split(',').map(p=>p.replace(/\D/g,'').slice(-10)).includes(phone)
+    );
     if(!school){
       errEl.textContent = 'Ye number kisi school se match nahi hua. Office se sampark karein.';
     } else {
