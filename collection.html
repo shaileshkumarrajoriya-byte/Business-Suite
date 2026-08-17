@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0F2A5C">
+<link rel="manifest" href="manifest-collector.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Collection Portal">
+<title>Collection Portal — DAXON MOBILITY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-dark: #0F2A5C;
+    --paper: #FBF9F4;
+    --paper-line: #E7E1D3;
+    --brass: #D4AF37;
+    --brass-deep: #A8791C;
+    --brass-light: #F0D687;
+    --paid: #3F7859;
+    --paid-bg: #E7F3EC;
+    --due: #B23B31;
+    --due-bg: #FBEAE8;
+    --text: #2B2E33;
+    --muted: #6B7280;
+    --action: #0E9F6E;
+    --action-deep: #076E4C;
+    --action-light: #4CC495;
+    --shadow-card: 0 1px 2px rgba(20,15,5,0.05), 0 14px 32px rgba(20,15,5,0.09);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body{ height:100%; margin:0; }
+  body{
+    background: var(--paper); color: var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom: 30px;
+  }
+  .wrap{ max-width:460px; margin:0 auto; padding: 0 16px; }
+  header{
+    position:relative;
+    background: linear-gradient(165deg, #17203a 0%, #0F2A5C 55%, #081833 100%);
+    color:#fff; padding: 40px 24px 46px; text-align:center;
+    border-bottom: 3px solid var(--brass);
+  }
+  header::after{
+    content:''; position:absolute; inset:0; pointer-events:none; opacity:0.06;
+    background-image: repeating-linear-gradient(135deg, #fff 0 2px, transparent 2px 14px);
+  }
+  header img{ height:56px; width:auto; margin-bottom:12px; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.35)); border-radius:12px; position:relative; z-index:2; }
+  header h1{ font-family:'Bitter',serif; font-size:1.3rem; margin:0; font-weight:800; position:relative; z-index:2; }
+  header p{ margin:4px 0 0; font-size:0.8rem; color:#C9D4E8; position:relative; z-index:2; }
+  .install-toggle-btn{
+    position:absolute; top:14px; left:14px;
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:#fff;
+    width:30px; height:30px; border-radius:50%; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .card{ background:#fff; border:1px solid var(--paper-line); border-radius:16px; padding:20px; margin-top:-30px; position:relative; z-index:5; box-shadow:var(--shadow-card); }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:0.78rem; font-weight:600; color:var(--muted); margin-bottom:6px; }
+  .field input, .field select{
+    width:100%; padding:13px 14px; border:1.5px solid var(--paper-line); border-radius:12px;
+    font-size:1rem; font-family:inherit; box-sizing:border-box; background:#fff;
+  }
+  .field input:focus{ outline:none; border-color:var(--brass); }
+  .btn-primary{
+    width:100%; padding:14px; background:linear-gradient(160deg, var(--action-light) 0%, var(--action) 45%, var(--action-deep) 100%);
+    color:#fff; border:none; border-radius:12px; font-weight:700; font-size:1rem; cursor:pointer;
+    box-shadow: 0 6px 18px rgba(14,159,110,0.28);
+  }
+  .btn-primary:active{ transform:scale(0.98); }
+  .error-text{ color:var(--due); font-size:0.82rem; margin-top:8px; text-align:center; }
+
+  .summary-strip{ display:flex; gap:10px; margin:16px 0; }
+  .summary-strip .box{ flex:1; background:#fff; border:1px solid var(--paper-line); border-radius:12px; padding:12px; text-align:center; }
+  .summary-strip .box .num{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:1.1rem; color:var(--ink-dark); }
+  .summary-strip .box .lbl{ font-size:0.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; margin-top:2px; }
+
+  #searchInput{
+    width:100%; box-sizing:border-box; padding:13px 14px; border:1.5px solid var(--paper-line); border-radius:12px;
+    font-size:0.95rem; font-family:inherit; margin-bottom:12px;
+  }
+  .filter-row{ display:flex; gap:8px; margin-bottom:14px; }
+  .filter-row select{ flex:1; padding:10px 12px; border:1.5px solid var(--paper-line); border-radius:10px; font-family:inherit; font-size:0.84rem; }
+
+  .stu-row{
+    background:#fff; border:1px solid var(--paper-line); border-radius:14px; padding:14px 16px; margin-bottom:10px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer;
+  }
+  .stu-row .name{ font-weight:700; color:var(--ink-dark); font-size:0.92rem; }
+  .stu-row .sub{ font-size:0.74rem; color:var(--muted); margin-top:2px; }
+  .status-badge{ flex:none; font-size:0.68rem; font-weight:700; padding:5px 10px; border-radius:20px; white-space:nowrap; }
+  .status-badge.paid{ color:var(--paid); background:var(--paid-bg); }
+  .status-badge.due{ color:var(--due); background:var(--due-bg); }
+  .status-badge.partial{ color:var(--brass-deep); background:var(--brass-light); }
+  .status-badge.upcoming{ color:var(--muted); background:var(--paper); }
+
+  .empty-note{ font-size:0.82rem; color:var(--muted); text-align:center; padding:30px 0; }
+  .back-link{ display:block; text-align:center; margin-top:22px; color:var(--muted); font-size:0.82rem; text-decoration:none; }
+
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:999;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay .modal-card{ background:#fff; border-radius:16px; max-width:400px; width:100%; padding:22px; max-height:85vh; overflow-y:auto; }
+  .modal-close-btn{
+    width:100%; margin-top:12px; background:var(--paper); border:1px solid var(--paper-line);
+    border-radius:10px; padding:11px; font-weight:600; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button type="button" id="installBtn" class="install-toggle-btn" aria-label="Install App" style="display:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+  <img src="logo-header.png" alt="Logo" onerror="this.style.display='none'">
+  <h1>DAXON MOBILITY</h1>
+  <p>Collection Portal</p>
+</header>
+
+<div class="wrap">
+
+  <div class="card" id="loginScreen">
+    <div class="field">
+      <label>Mobile Number</label>
+      <input type="tel" id="phoneInput" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric">
+    </div>
+    <button type="button" class="btn-primary" id="loginBtn">Login</button>
+    <div class="error-text" id="loginError"></div>
+  </div>
+
+  <div id="pinOnlyScreen" style="display:none;">
+    <div class="card">
+      <h2 style="text-align:center;font-family:'Bitter',serif;color:var(--ink-dark);">Welcome Back</h2>
+      <p style="text-align:center;font-size:0.85rem;color:var(--muted);">Apna 4-digit PIN daalein.</p>
+      <input type="tel" id="pinOnlyInput" placeholder="PIN" maxlength="4" inputmode="numeric" style="width:100%; box-sizing:border-box; padding:14px; margin-bottom:14px; border:1.5px solid var(--paper-line); border-radius:12px; font-size:1.3rem; font-family:'JetBrains Mono',monospace; letter-spacing:6px; text-align:center;">
+      <button type="button" class="btn-primary" id="pinOnlyLoginBtn">Login</button>
+      <div id="pinOnlyLoading" style="display:none;text-align:center;font-size:0.82rem;color:var(--muted);margin-top:10px;">Checking…</div>
+      <div class="error-text" id="pinOnlyError"></div>
+    </div>
+    <div id="pinOnlySwitchLink" style="text-align:center;margin-top:18px;font-size:0.82rem;color:var(--brass-deep);font-weight:700;text-decoration:underline;cursor:pointer;">Not you? Login with different number</div>
+  </div>
+
+  <div id="setPinScreen" style="display:none;">
+    <div class="card">
+      <h2 style="text-align:center;font-family:'Bitter',serif;color:var(--ink-dark);">Set Your PIN</h2>
+      <p style="text-align:center;font-size:0.85rem;color:var(--muted);">Agली baar se sirf yahi PIN chahiye hoga.</p>
+      <input type="tel" id="newPinInput" placeholder="Choose a 4-digit PIN" maxlength="4" inputmode="numeric" style="width:100%; box-sizing:border-box; padding:14px; margin-bottom:14px; border:1.5px solid var(--paper-line); border-radius:12px; font-size:1.3rem; font-family:'JetBrains Mono',monospace; letter-spacing:6px; text-align:center;">
+      <button type="button" class="btn-primary" id="setPinBtn">Save PIN &amp; Continue</button>
+      <div class="error-text" id="setPinError"></div>
+    </div>
+  </div>
+
+  <div id="dashScreen" style="display:none;">
+    <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.15rem;color:var(--ink-dark);margin-top:16px;" id="executiveName">—</div>
+    <div class="summary-strip">
+      <div class="box"><div class="num" id="sumTotal">0</div><div class="lbl">Students</div></div>
+      <div class="box"><div class="num" id="sumDue">0</div><div class="lbl">Due</div></div>
+      <div class="box"><div class="num" id="sumToday">₹0</div><div class="lbl">Collected Today</div></div>
+    </div>
+
+    <button type="button" id="openMyHistoryBtn" style="width:100%;margin-bottom:10px;background:#fff;border:1px solid var(--paper-line);color:var(--ink-dark);font-weight:700;font-size:0.84rem;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>
+      My Collection History (Month-wise)
+    </button>
+
+    <button type="button" id="openMonthStatusBtn" style="width:100%;margin-bottom:14px;background:#fff;border:1px solid var(--paper-line);color:var(--ink-dark);font-weight:700;font-size:0.84rem;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 5-3.5 8.5-9 10-5.5-1.5-9-5-9-10V6l9-4 9 4z"/></svg>
+      Month-wise Collection Status (Sabhi Students)
+    </button>
+
+    <div class="field" style="margin-bottom:12px;">
+      <label>Kis mahine ka collection ho raha hai?</label>
+      <select id="collectionMonthSelect"></select>
+    </div>
+
+    <input type="text" id="searchInput" placeholder="Naam, village, ya school se dhoondein...">
+    <div class="filter-row">
+      <select id="filterStatus">
+        <option value="">Fee Status: All</option>
+        <option value="due">⏳ Not Paid</option>
+        <option value="partial">½ Half Paid</option>
+        <option value="paid">✅ Fee Received</option>
+        <option value="upcoming">🕒 Not Yet Due</option>
+      </select>
+      <select id="filterVillage"><option value="">All Villages</option></select>
+    </div>
+
+    <div id="todayCollectionsSection" style="display:none;background:#fff;border:1.5px solid var(--paid);border-radius:14px;padding:14px 16px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-weight:800;color:var(--ink-dark);font-family:'Bitter',serif;">✓ Aaj Collect Kiya</span>
+        <span id="todayCollectionsTotal" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--paid);"></span>
+      </div>
+      <div id="todayCollectionsList"></div>
+    </div>
+
+    <div id="studentList"></div>
+
+    <a href="#" class="back-link" id="backBtn">← Log out</a>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="monthStatusOverlay">
+  <div class="modal-card">
+    <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.05rem;color:var(--ink-dark);margin-bottom:4px;">Month-wise Collection Status</div>
+    <p style="font-size:0.8rem;color:var(--muted);margin:0 0 14px;">Sabhi students ka poora hisab — kis mahine ka collection ho gaya, kiska baki hai.</p>
+    <div id="monthStatusContent"></div>
+    <button type="button" class="modal-close-btn" data-close="monthStatusOverlay">Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="myHistoryOverlay">
+  <div class="modal-card">
+    <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.05rem;color:var(--ink-dark);margin-bottom:4px;">My Collection History</div>
+    <p style="font-size:0.8rem;color:var(--muted);margin:0 0 14px;">Har mahine ka total collection.</p>
+    <div id="myHistoryContent"></div>
+    <button type="button" class="modal-close-btn" data-close="myHistoryOverlay">Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="collectOverlay">
+  <div class="modal-card">
+    <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.05rem;color:var(--ink-dark);" id="collectStudentName">—</div>
+    <div style="font-size:0.8rem;color:var(--muted);margin:2px 0 14px;" id="collectStudentSub"></div>
+    <div id="collectPendingNote" style="display:none;background:var(--due-bg);color:var(--due);font-size:0.8rem;padding:10px 12px;border-radius:10px;margin-bottom:14px;line-height:1.6;"></div>
+    <div class="field">
+      <label>Amount Collected (₹)</label>
+      <input type="number" id="collectAmount" min="0">
+    </div>
+    <div class="field">
+      <label>Date</label>
+      <input type="date" id="collectDate">
+    </div>
+    <div id="collectStatus" style="text-align:center;font-size:0.82rem;margin-bottom:8px;min-height:18px;"></div>
+    <button type="button" class="btn-primary" id="saveCollectionBtn">Record Collection</button>
+    <button type="button" class="modal-close-btn" data-close="collectOverlay">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="installOverlay">
+  <div class="modal-card">
+    <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.05rem;color:var(--ink-dark);margin-bottom:14px;">Install App</div>
+    <div style="font-size:0.86rem;color:var(--text);line-height:1.7;">
+      Is portal ko apne phone ki Home Screen par ek app ki tarah add karein:<br><br>
+      <b>Android (Chrome):</b> Upar-right corner mein <b>⋮</b> (teen dot) menu par tap karein, phir <b>"Add to Home screen"</b> ya <b>"Install app"</b> choose karein.<br><br>
+      <b>iPhone (Safari):</b> Neeche Share icon <b>⬆</b> par tap karein, phir <b>"Add to Home Screen"</b> choose karein.
+    </div>
+    <button type="button" id="installOverlayClose" class="modal-close-btn">Got it</button>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDzABowWH-8LZrRhrIssvDhL4mfVT_DXOk",
+    authDomain: "van-register.firebaseapp.com",
+    databaseURL: "https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "van-register",
+    storageBucket: "van-register.firebasestorage.app",
+    messagingSenderId: "89738000508",
+    appId: "1:89738000508:web:1ef2cbd3093dcb273131f9"
+  };
+  const fbApp = initializeApp(firebaseConfig);
+  const fbAuth = getAuth(fbApp);
+
+  window.__firebaseAuthReady = new Promise((resolve, reject)=>{
+    let settled = false;
+    onAuthStateChanged(fbAuth, (user)=>{ if(user && !settled){ settled = true; resolve(user); } });
+    signInAnonymously(fbAuth).catch(e=>{
+      console.error('Firebase anonymous sign-in failed:', e);
+      if(!settled){ settled = true; reject(e); }
+    });
+    setTimeout(()=>{
+      if(!settled){ settled = true; reject(new Error('Firebase auth timed out')); }
+    }, 30000);
+  });
+
+  window.getFirebaseAuthToken = async function(){
+    const user = await window.__firebaseAuthReady;
+    return await user.getIdToken();
+  };
+
+  window.authedFetch = async function(url, options){
+    const token = await window.getFirebaseAuthToken();
+    const sep = url.includes('?') ? '&' : '?';
+    return fetch(`${url}${sep}auth=${token}`, options);
+  };
+</script>
+<script>
+
+async function waitForAuthedFetch(timeoutMs){
+  timeoutMs = timeoutMs || 15000;
+  const start = Date.now();
+  while(typeof window.authedFetch !== 'function'){
+    if(Date.now() - start > timeoutMs){
+      throw new Error('Firebase script did not finish loading (slow/no internet)');
+    }
+    await new Promise(r => setTimeout(r, 100));
+  }
+  return window.authedFetch;
+}
+
+const FIREBASE_DB_URL = 'https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app';
+const MONTHS = ["Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr"];
+const MONTH_KEYS = ["07","08","09","10","11","12","01","02","03","04"];
+
+let state = { students: [], schools: [], vehicles: [], fees: {}, lateFeeWaivers: {}, collectionExecutives: [], collectionLog: [] };
+let currentExecutive = null;
+let fullRawState = null;
+let pendingLoginPhone = '';
+
+function yearForMonth(monthKey){
+  const idx = MONTH_KEYS.indexOf(monthKey);
+  const baseYear = new Date().getFullYear();
+  // Academic year starts July — figure out which calendar year each month
+  // key belongs to relative to "now", same convention used across the suite.
+  const now = new Date();
+  const nowMonthNum = now.getMonth() + 1;
+  const nowKey = String(nowMonthNum).padStart(2,'0');
+  const nowIdx = MONTH_KEYS.indexOf(nowKey);
+  const diff = idx - nowIdx;
+  let y = now.getFullYear();
+  if(diff > 6) y -= 1;
+  if(diff < -6) y += 1;
+  return y;
+}
+
+function currentRealMonthKey(){
+  const now = new Date();
+  return String(now.getMonth()+1).padStart(2,'0');
+}
+
+function feeKey(studentId, monthKey){
+  return studentId + '_' + monthKey;
+}
+
+function paidAmountFor(studentId, monthKey){
+  const rec = state.fees[feeKey(studentId, monthKey)];
+  return rec ? Number(rec.amountPaid||0) : 0;
+}
+
+const LATE_FEE_AMOUNT = 50;
+function isPastLateFeeGrace(monthKey){
+  const feeYear = yearForMonth(monthKey);
+  const feeMonthNum = parseInt(monthKey, 10);
+  let followMonth = feeMonthNum + 1;
+  let followYear = feeYear;
+  if(followMonth > 12){ followMonth = 1; followYear += 1; }
+  const graceEnd = new Date(followYear, followMonth - 1, 10, 23, 59, 59);
+  return new Date() > graceEnd;
+}
+function isLateFeeWaived(studentId, monthKey){
+  return !!(state.lateFeeWaivers && state.lateFeeWaivers[feeKey(studentId, monthKey)]);
+}
+function lateFeeFor(student, monthKey){
+  if(Number(student.fee||0) <= 0) return 0;
+  const paidAmt = paidAmountFor(student.id, monthKey);
+  if(paidAmt >= Number(student.fee||0)) return 0;
+  if(!isPastLateFeeGrace(monthKey)) return 0;
+  if(isLateFeeWaived(student.id, monthKey)) return 0;
+  return LATE_FEE_AMOUNT;
+}
+function dueAmountFor(student, monthKey){
+  const base = Math.max(0, Number(student.fee||0) - paidAmountFor(student.id, monthKey));
+  return base > 0 ? base + lateFeeFor(student, monthKey) : base;
+}
+function isMonthOverdue(monthKey){
+  const feeYear = yearForMonth(monthKey);
+  const feeMonth = parseInt(monthKey, 10);
+  const now = new Date();
+  const nowYear = now.getFullYear();
+  const nowMonth = now.getMonth() + 1;
+  if(nowYear > feeYear) return true;
+  if(nowYear === feeYear && nowMonth > feeMonth) return true;
+  return false;
+}
+function feeStatus(student, monthKey){
+  const fee = Number(student.fee||0);
+  const paidAmt = paidAmountFor(student.id, monthKey);
+  if(fee <= 0) return paidAmt > 0 ? 'paid' : (isMonthOverdue(monthKey) ? 'due' : 'upcoming');
+  if(paidAmt >= fee) return 'paid';
+  if(paidAmt > 0) return 'partial';
+  return isMonthOverdue(monthKey) ? 'due' : 'upcoming';
+}
+function recordPayment(studentId, monthKey, amount, date){
+  const key = feeKey(studentId, monthKey);
+  const amt = Math.max(0, Number(amount)||0);
+  if(amt <= 0){
+    delete state.fees[key];
+  } else {
+    const existing = state.fees[key];
+    state.fees[key] = {
+      amountPaid: amt,
+      lastDate: date || new Date().toISOString().slice(0,10),
+      recordedAt: (existing && existing.recordedAt) || new Date().toISOString()
+    };
+  }
+}
+function pendingMonthsBefore(studentId, monthKey){
+  const student = state.students.find(s=>s.id===studentId);
+  if(!student) return [];
+  const fee = Number(student.fee||0);
+  if(fee <= 0) return [];
+  const targetIdx = MONTH_KEYS.indexOf(monthKey);
+  if(targetIdx <= 0) return [];
+  const result = [];
+  for(let i=0; i<targetIdx; i++){
+    const mk = MONTH_KEYS[i];
+    const due = dueAmountFor(student, mk);
+    if(due > 0) result.push({ monthKey: mk, due });
+  }
+  return result;
+}
+
+function vehicleName(id){
+  const v = state.vehicles.find(v=>v.name===id || v.id===id);
+  return v ? v.name : '';
+}
+function schoolName(id){
+  const s = state.schools.find(s=>s.id===id);
+  return s ? s.name : '';
+}
+
+// ---------- Data loading ----------
+async function loadData(){
+  try{
+    const res = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/data.json`);
+    const raw = await res.json();
+    if(raw && raw.value){
+      const parsed = JSON.parse(raw.value);
+      fullRawState = parsed;
+      state.students = parsed.students || [];
+      state.schools = parsed.schools || [];
+      state.vehicles = parsed.vehicles || [];
+      state.fees = parsed.fees || {};
+      state.lateFeeWaivers = parsed.lateFeeWaivers || {};
+      state.collectionExecutives = parsed.collectionExecutives || [];
+      state.collectionLog = parsed.collectionLog || [];
+    }
+  }catch(e){
+    console.error('Load failed', e);
+    throw e;
+  }
+}
+
+async function isDangerousEmptyOverwrite(payload){
+  try{
+    const newCount = Array.isArray(payload.students) ? payload.students.length : 0;
+    if(newCount > 0) return false;
+    const fn = await waitForAuthedFetch(5000);
+    const res = await fn(`${FIREBASE_DB_URL}/data.json`);
+    if(res && res.ok){
+      const data = await res.json();
+      if(data && data.value){
+        const prev = JSON.parse(data.value);
+        const prevCount = Array.isArray(prev.students) ? prev.students.length : 0;
+        return prevCount >= 3;
+      }
+    }
+    return false;
+  }catch(e){ return false; }
+}
+
+async function saveCollectorData(){
+  if(await isDangerousEmptyOverwrite(fullRawState)){
+    return { ok:false, error: new Error('Save blocked: data looked unexpectedly empty') };
+  }
+  try{
+    const res = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/data.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value: JSON.stringify(fullRawState) })
+    });
+    if(!res.ok) throw new Error('Save failed');
+    return { ok:true };
+  }catch(e){
+    return { ok:false, error: e };
+  }
+}
+
+function todayDateKey(){
+  return new Date().toISOString().slice(0,10);
+}
+
+// ---------- Login ----------
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const phone = document.getElementById('phoneInput').value.trim();
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  if(!/^\d{10}$/.test(phone)){
+    errEl.textContent = 'Kripya 10 ankon ka sahi mobile number daalein.';
+    return;
+  }
+  document.getElementById('loginBtn').textContent = 'Checking…';
+  document.getElementById('loginBtn').disabled = true;
+  try{
+    await loadData();
+    const exec = state.collectionExecutives.find(c => (c.phone||'').replace(/\D/g,'').slice(-10) === phone);
+    if(!exec){
+      errEl.textContent = 'Ye number kisi collection executive se match nahi hua. Office se sampark karein.';
+    } else if(!exec.pin){
+      pendingLoginPhone = phone;
+      currentExecutive = exec;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('setPinScreen').style.display = 'block';
+    } else {
+      showDashboard(exec);
+    }
+  }catch(e){
+    errEl.textContent = '⚠️ Internet check karke dobara koshish karein.';
+  }
+  document.getElementById('loginBtn').textContent = 'Login';
+  document.getElementById('loginBtn').disabled = false;
+});
+
+document.getElementById('setPinBtn').addEventListener('click', async ()=>{
+  const pin = document.getElementById('newPinInput').value.trim();
+  const errEl = document.getElementById('setPinError');
+  if(!/^\d{4}$/.test(pin)){
+    errEl.textContent = '4-digit PIN chunein.';
+    return;
+  }
+  const idx = fullRawState.collectionExecutives.findIndex(c => c.id === currentExecutive.id);
+  if(idx === -1) return;
+  fullRawState.collectionExecutives[idx].pin = pin;
+  const result = await saveCollectorData();
+  if(result.ok){
+    state.collectionExecutives = fullRawState.collectionExecutives;
+    currentExecutive = fullRawState.collectionExecutives[idx];
+    try{ localStorage.setItem('rememberedCollectorId', currentExecutive.id); }catch(e){}
+    document.getElementById('setPinScreen').style.display = 'none';
+    showDashboard(currentExecutive);
+  } else {
+    errEl.textContent = '⚠️ Save nahi ho paaya — internet check karein.';
+  }
+});
+
+// ---------- Remembered-device PIN-only login ----------
+(function initRememberedLogin(){
+  let rememberedId = null;
+  try{ rememberedId = localStorage.getItem('rememberedCollectorId'); }catch(e){}
+  if(rememberedId){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('pinOnlyScreen').style.display = 'block';
+  }
+})();
+
+document.getElementById('pinOnlySwitchLink').addEventListener('click', ()=>{
+  try{ localStorage.removeItem('rememberedCollectorId'); }catch(e){}
+  document.getElementById('pinOnlyScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'block';
+});
+
+document.getElementById('pinOnlyLoginBtn').addEventListener('click', async ()=>{
+  const errorEl = document.getElementById('pinOnlyError');
+  const loadingEl = document.getElementById('pinOnlyLoading');
+  errorEl.textContent = '';
+  const enteredPin = document.getElementById('pinOnlyInput').value.trim();
+  if(!/^\d{4}$/.test(enteredPin)){
+    errorEl.textContent = '4-digit PIN daalein.';
+    return;
+  }
+  let rememberedId = null;
+  try{ rememberedId = localStorage.getItem('rememberedCollectorId'); }catch(e){}
+  if(!rememberedId){
+    document.getElementById('pinOnlyScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'block';
+    return;
+  }
+  loadingEl.style.display = 'block';
+  try{
+    await loadData();
+  }catch(e){
+    loadingEl.style.display = 'none';
+    errorEl.textContent = 'Internet check karke dobara koshish karein.';
+    return;
+  }
+  loadingEl.style.display = 'none';
+  const exec = state.collectionExecutives.find(c => c.id === rememberedId);
+  if(!exec){
+    try{ localStorage.removeItem('rememberedCollectorId'); }catch(e){}
+    document.getElementById('pinOnlyScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'block';
+    return;
+  }
+  if(exec.pin !== enteredPin){
+    errorEl.textContent = 'Galat PIN.';
+    return;
+  }
+  document.getElementById('pinOnlyInput').value = '';
+  showDashboard(exec);
+});
+
+// ---------- Dashboard ----------
+function showDashboard(exec){
+  currentExecutive = exec;
+  if(exec.pin){
+    try{ localStorage.setItem('rememberedCollectorId', exec.id); }catch(e){}
+  }
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('pinOnlyScreen').style.display = 'none';
+  document.getElementById('setPinScreen').style.display = 'none';
+  document.getElementById('dashScreen').style.display = 'block';
+  document.getElementById('executiveName').textContent = exec.name;
+  populateVillageFilter();
+  populateCollectionMonthSelect();
+  renderSummaryStrip();
+  renderTodayCollections();
+  renderStudentList();
+}
+
+function populateVillageFilter(){
+  const villages = [...new Set(state.students.map(s => (s.village||'').trim()).filter(Boolean))].sort();
+  const sel = document.getElementById('filterVillage');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All Villages</option>' + villages.map(v => `<option value="${v}">${v}</option>`).join('');
+  sel.value = cur;
+}
+
+// Which month the executive is currently collecting for — defaults to the
+// real calendar month, but can be changed (e.g. still collecting July dues
+// even though it's already August).
+let selectedCollectionMonth = currentRealMonthKey();
+function populateCollectionMonthSelect(){
+  const sel = document.getElementById('collectionMonthSelect');
+  sel.innerHTML = MONTH_KEYS.map((mk,i) => `<option value="${mk}">${MONTHS[i]} ${yearForMonth(mk)}</option>`).join('');
+  sel.value = selectedCollectionMonth;
+}
+document.getElementById('collectionMonthSelect').addEventListener('change', (e)=>{
+  selectedCollectionMonth = e.target.value;
+  renderSummaryStrip();
+  renderStudentList();
+});
+
+function renderSummaryStrip(){
+  const mk = selectedCollectionMonth;
+  const dueCount = state.students.filter(s => feeStatus(s, mk) === 'due').length;
+  const today = todayDateKey();
+  const todayTotal = (state.collectionLog || [])
+    .filter(l => l.executiveId === currentExecutive.id && (l.createdAt||'').startsWith(today))
+    .reduce((sum,l) => sum + Number(l.amount||0), 0);
+  document.getElementById('sumTotal').textContent = state.students.length;
+  document.getElementById('sumDue').textContent = dueCount;
+  document.getElementById('sumToday').textContent = '₹' + todayTotal;
+}
+
+// Always-visible list of everything THIS executive has collected today —
+// so a successful collection never seems to "disappear", even if the
+// student's new "Paid" status makes them fall out of a "Not Paid" filter.
+function renderTodayCollections(){
+  const today = todayDateKey();
+  const mine = (state.collectionLog || [])
+    .filter(l => l.executiveId === currentExecutive.id && (l.createdAt||'').startsWith(today))
+    .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const section = document.getElementById('todayCollectionsSection');
+  if(mine.length === 0){
+    section.style.display = 'none';
+    return;
+  }
+  const total = mine.reduce((sum,l) => sum + Number(l.amount||0), 0);
+  document.getElementById('todayCollectionsTotal').textContent = '₹' + total;
+  document.getElementById('todayCollectionsList').innerHTML = mine.map(l => `
+    <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.84rem;border-bottom:1px dashed var(--paper-line);">
+      <span>${l.studentName}</span>
+      <span style="font-family:'JetBrains Mono',monospace;color:var(--paid);font-weight:600;">₹${l.amount}</span>
+    </div>
+  `).join('');
+  section.style.display = 'block';
+}
+
+function renderStudentList(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const statusFilter = document.getElementById('filterStatus').value;
+  const villageFilter = document.getElementById('filterVillage').value;
+  const mk = selectedCollectionMonth;
+
+  let list = state.students;
+  if(q){
+    list = list.filter(s => {
+      const hay = [s.name, s.village, s.parent, s.phone, schoolName(s.schoolId)].join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+  }
+  if(villageFilter) list = list.filter(s => (s.village||'').trim() === villageFilter);
+  if(statusFilter) list = list.filter(s => feeStatus(s, mk) === statusFilter);
+
+  list = list.slice().sort((a,b) => (a.name||'').localeCompare(b.name||''));
+
+  const container = document.getElementById('studentList');
+  if(list.length === 0){
+    container.innerHTML = '<div class="empty-note">Koi student nahi mila.</div>';
+    return;
+  }
+  const labels = { paid:'Paid', due:'Due', partial:'Partial', upcoming:'Not Due' };
+  container.innerHTML = list.slice(0, 150).map(s => {
+    const status = feeStatus(s, mk);
+    return `
+    <div class="stu-row" onclick="openCollectModal('${s.id}')">
+      <div style="flex:1;min-width:0;">
+        <div class="name">${s.name}</div>
+        <div class="sub">${s.village || ''}${s.village && schoolName(s.schoolId) ? ' · ' : ''}${schoolName(s.schoolId) || ''}</div>
+        ${s.phone ? `<a href="tel:${s.phone}" onclick="event.stopPropagation();" style="display:inline-flex;align-items:center;gap:4px;margin-top:4px;font-size:0.76rem;color:var(--action-deep);font-weight:600;text-decoration:none;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          ${s.phone}
+        </a>` : ''}
+      </div>
+      <span class="status-badge ${status}">${labels[status]}</span>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('searchInput').addEventListener('input', renderStudentList);
+document.getElementById('filterStatus').addEventListener('change', renderStudentList);
+document.getElementById('filterVillage').addEventListener('change', renderStudentList);
+
+// ---------- Collect payment ----------
+let collectContext = { studentId: null, monthKey: null };
+function openCollectModal(studentId){
+  const student = state.students.find(s => s.id === studentId);
+  if(!student) return;
+  const mk = selectedCollectionMonth;
+  collectContext = { studentId, monthKey: mk };
+  const monthIdx = MONTH_KEYS.indexOf(mk);
+
+  document.getElementById('collectStudentName').textContent = student.name;
+  document.getElementById('collectStudentSub').innerHTML =
+    `${MONTHS[monthIdx]} ${yearForMonth(mk)} · ${student.village || ''}${student.phone ? ` · <a href="tel:${student.phone}" style="color:var(--action-deep);font-weight:600;">${student.phone}</a>` : ''}`;
+
+  const fee = Number(student.fee||0);
+  const lateFee = lateFeeFor(student, mk);
+  const feeWithLate = fee + lateFee;
+  const pendingList = pendingMonthsBefore(studentId, mk);
+  const pendingTotal = pendingList.reduce((sum,p) => sum+p.due, 0);
+  const noteEl = document.getElementById('collectPendingNote');
+  if(pendingTotal > 0){
+    const lines = pendingList.map(p => {
+      const idx = MONTH_KEYS.indexOf(p.monthKey);
+      return `${MONTHS[idx]} pending: ₹${p.due}`;
+    });
+    lines.push(`${MONTHS[monthIdx]}: ₹${feeWithLate}`);
+    lines.push(`<b>Total due: ₹${pendingTotal + feeWithLate}</b>`);
+    noteEl.innerHTML = lines.join('<br>');
+    noteEl.style.display = 'block';
+  } else {
+    noteEl.style.display = 'none';
+  }
+
+  const paidSoFar = paidAmountFor(studentId, mk);
+  if(paidSoFar > 0){
+    document.getElementById('collectAmount').value = paidSoFar;
+  } else if(pendingTotal > 0){
+    document.getElementById('collectAmount').value = pendingTotal + feeWithLate;
+  } else {
+    document.getElementById('collectAmount').value = feeWithLate;
+  }
+  document.getElementById('collectDate').value = todayDateKey();
+  document.getElementById('collectStatus').textContent = '';
+  document.getElementById('collectOverlay').style.display = 'flex';
+}
+
+document.querySelectorAll('[data-close]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.getElementById(btn.dataset.close).style.display = 'none';
+  });
+});
+
+document.getElementById('saveCollectionBtn').addEventListener('click', async ()=>{
+  const { studentId, monthKey } = collectContext;
+  const amount = Number(document.getElementById('collectAmount').value) || 0;
+  const date = document.getElementById('collectDate').value;
+  const statusEl = document.getElementById('collectStatus');
+  const btn = document.getElementById('saveCollectionBtn');
+  if(amount <= 0){
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = 'Sahi amount daalein.';
+    return;
+  }
+  if(!fullRawState) return;
+
+  // Same waterfall logic used across the whole suite: oldest pending months
+  // first, then the current month (including its own late fee), then any
+  // leftover rolls forward as an advance.
+  fullRawState.fees = fullRawState.fees || {};
+  fullRawState.lateFeeWaivers = fullRawState.lateFeeWaivers || {};
+  state.fees = fullRawState.fees;
+  state.lateFeeWaivers = fullRawState.lateFeeWaivers;
+
+  const student = state.students.find(s => s.id === studentId);
+  const fee = Number(student && student.fee || 0);
+  const feeWithLateForCurrent = fee + (student ? lateFeeFor(student, monthKey) : 0);
+  const pendingList = pendingMonthsBefore(studentId, monthKey);
+  let remaining = amount;
+  pendingList.forEach(p => {
+    if(remaining <= 0) return;
+    const alreadyPaid = paidAmountFor(studentId, p.monthKey);
+    const applied = Math.min(remaining, p.due);
+    recordPayment(studentId, p.monthKey, alreadyPaid + applied, date);
+    remaining -= applied;
+  });
+  const appliedToCurrent = feeWithLateForCurrent > 0 ? Math.min(remaining, feeWithLateForCurrent) : remaining;
+  recordPayment(studentId, monthKey, appliedToCurrent, date);
+  remaining -= appliedToCurrent;
+
+  if(fee > 0){
+    let nextIdx = MONTH_KEYS.indexOf(monthKey) + 1;
+    while(remaining > 0 && nextIdx < MONTH_KEYS.length){
+      const nextMonthKey = MONTH_KEYS[nextIdx];
+      const alreadyPaidNext = paidAmountFor(studentId, nextMonthKey);
+      const stillOwedNext = Math.max(0, fee - alreadyPaidNext);
+      if(stillOwedNext > 0){
+        const applied = Math.min(remaining, stillOwedNext);
+        recordPayment(studentId, nextMonthKey, alreadyPaidNext + applied, date);
+        remaining -= applied;
+      }
+      nextIdx++;
+    }
+  }
+
+  fullRawState.fees = state.fees;
+
+  // Audit trail — who collected what, from whom, when. monthKey is stored
+  // so the office can generate the correct bill when they confirm this.
+  fullRawState.collectionLog = fullRawState.collectionLog || [];
+  fullRawState.collectionLog.push({
+    id: 'collection_' + Date.now(),
+    executiveId: currentExecutive.id,
+    executiveName: currentExecutive.name,
+    studentId,
+    studentName: student ? student.name : '',
+    amount,
+    monthKey,
+    date,
+    createdAt: new Date().toISOString(),
+    confirmed: false
+  });
+
+  btn.disabled = true;
+  statusEl.style.color = 'var(--muted)';
+  statusEl.textContent = 'Saving…';
+  const result = await saveCollectorData();
+  btn.disabled = false;
+  if(result.ok){
+    state.collectionLog = fullRawState.collectionLog;
+    statusEl.style.color = 'var(--paid)';
+    statusEl.textContent = '✓ Collection record ho gaya';
+    setTimeout(()=>{
+      document.getElementById('collectOverlay').style.display = 'none';
+      renderSummaryStrip();
+      renderTodayCollections();
+      renderStudentList();
+    }, 900);
+  } else {
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = '⚠️ Save nahi ho paaya — internet check karein';
+  }
+});
+
+// ---------- My Collection History (month-wise) ----------
+// ---------- Month-wise Collection Status (across all students) ----------
+document.getElementById('openMonthStatusBtn').addEventListener('click', ()=>{
+  const container = document.getElementById('monthStatusContent');
+  const today = todayDateKey();
+  container.innerHTML = MONTH_KEYS.map((mk, i) => {
+    let totalFee = 0, totalPaid = 0, paidCount = 0, partialCount = 0, dueCount = 0, upcomingCount = 0;
+    state.students.forEach(s => {
+      const fee = Number(s.fee||0);
+      if(fee <= 0) return;
+      totalFee += fee;
+      totalPaid += Math.min(paidAmountFor(s.id, mk), fee);
+      const status = feeStatus(s, mk);
+      if(status === 'paid') paidCount++;
+      else if(status === 'partial') partialCount++;
+      else if(status === 'due') dueCount++;
+      else upcomingCount++;
+    });
+    const pending = Math.max(0, totalFee - totalPaid);
+    const isFullyDone = pending === 0 && (paidCount > 0 || totalFee === 0);
+    const isFuture = (dueCount + partialCount + paidCount) === 0 && upcomingCount > 0;
+    const pct = totalFee > 0 ? Math.round((totalPaid/totalFee)*100) : 0;
+
+    let statusBadge;
+    if(isFuture){
+      statusBadge = `<span style="font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:20px;color:var(--muted);background:var(--paper);">Not Due Yet</span>`;
+    } else if(isFullyDone){
+      statusBadge = `<span style="font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:20px;color:var(--paid);background:var(--paid-bg);">✓ Collection Done</span>`;
+    } else {
+      statusBadge = `<span style="font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:20px;color:var(--due);background:var(--due-bg);">⏳ Baki Hai</span>`;
+    }
+
+    return `
+      <div style="border:1px solid var(--paper-line);border-radius:12px;padding:12px 14px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-weight:700;color:var(--ink-dark);font-family:'Bitter',serif;">${MONTHS[i]} ${yearForMonth(mk)}</span>
+          ${statusBadge}
+        </div>
+        <div style="background:var(--paper);border-radius:6px;height:7px;overflow:hidden;margin-bottom:8px;">
+          <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--brass-light),var(--brass-deep));"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--muted);">
+          <span>Collected: <b style="color:var(--paid);">₹${totalPaid}</b></span>
+          <span>Baki: <b style="color:var(--due);">₹${pending}</b></span>
+        </div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">${paidCount} paid · ${partialCount} partial · ${dueCount} due</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('monthStatusOverlay').style.display = 'flex';
+});
+
+document.getElementById('openMyHistoryBtn').addEventListener('click', ()=>{
+  const myLog = (state.collectionLog || []).filter(l => l.executiveId === currentExecutive.id);
+  const container = document.getElementById('myHistoryContent');
+  if(myLog.length === 0){
+    container.innerHTML = '<div class="empty-note">Abhi tak koi collection record nahi hai.</div>';
+    document.getElementById('myHistoryOverlay').style.display = 'flex';
+    return;
+  }
+  const byMonth = {};
+  myLog.forEach(l => {
+    const d = new Date(l.createdAt);
+    const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    if(!byMonth[key]) byMonth[key] = { total: 0, count: 0, entries: [] };
+    byMonth[key].total += Number(l.amount||0);
+    byMonth[key].count += 1;
+    byMonth[key].entries.push(l);
+  });
+  const monthKeys = Object.keys(byMonth).sort().reverse();
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  container.innerHTML = monthKeys.map(mk => {
+    const [y, m] = mk.split('-');
+    const label = monthNames[Number(m)-1] + ' ' + y;
+    const grp = byMonth[mk];
+    const entriesHtml = grp.entries
+      .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .map(l => `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:0.8rem;border-bottom:1px dashed var(--paper-line);"><span>${l.studentName}</span><span style="font-family:'JetBrains Mono',monospace;">₹${l.amount}</span></div>`)
+      .join('');
+    return `
+      <details style="margin-bottom:10px;border:1px solid var(--paper-line);border-radius:10px;padding:10px 14px;">
+        <summary style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:700;color:var(--ink-dark);">
+          <span>${label}</span>
+          <span style="font-family:'JetBrains Mono',monospace;color:var(--paid);">₹${grp.total} <span style="font-size:0.7rem;color:var(--muted);font-weight:400;">(${grp.count})</span></span>
+        </summary>
+        <div style="margin-top:10px;">${entriesHtml}</div>
+      </details>
+    `;
+  }).join('');
+  document.getElementById('myHistoryOverlay').style.display = 'flex';
+});
+
+document.getElementById('backBtn').addEventListener('click', (e)=>{
+  e.preventDefault();
+  document.getElementById('dashScreen').style.display = 'none';
+  let rememberedId = null;
+  try{ rememberedId = localStorage.getItem('rememberedCollectorId'); }catch(e2){}
+  if(rememberedId){
+    document.getElementById('pinOnlyInput').value = '';
+    document.getElementById('pinOnlyError').textContent = '';
+    document.getElementById('pinOnlyScreen').style.display = 'block';
+  } else {
+    document.getElementById('loginScreen').style.display = 'block';
+    document.getElementById('phoneInput').value = '';
+  }
+});
+
+// ---------- Install App (Add to Home Screen) ----------
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(e=>console.log('Service worker registration failed:', e));
+}
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('installBtn').style.display = 'flex';
+});
+window.addEventListener('appinstalled', ()=>{
+  document.getElementById('installBtn').style.display = 'none';
+});
+const isStandaloneCollector = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+if(!isStandaloneCollector){
+  setTimeout(()=>{
+    if(document.getElementById('installBtn').style.display === 'none'){
+      document.getElementById('installBtn').style.display = 'flex';
+    }
+  }, 800);
+}
+document.getElementById('installBtn').addEventListener('click', async ()=>{
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+  } else {
+    document.getElementById('installOverlay').style.display = 'flex';
+  }
+});
+document.getElementById('installOverlayClose').addEventListener('click', ()=>{
+  document.getElementById('installOverlay').style.display = 'none';
+});
+</script>
+</body>
+</html>
