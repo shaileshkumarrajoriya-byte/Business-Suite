@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0F2A5C">
+<link rel="manifest" href="manifest-school.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="School Portal">
+<title>School Portal — DAXON MOBILITY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-dark: #0F2A5C;
+    --paper: #FBF9F4;
+    --paper-line: #E7E1D3;
+    --brass: #D4AF37;
+    --brass-deep: #A8791C;
+    --brass-light: #F0D687;
+    --paid: #3F7859;
+    --text: #2B2E33;
+    --muted: #6B7280;
+    --shadow-card: 0 1px 2px rgba(20,15,5,0.05), 0 14px 32px rgba(20,15,5,0.09);
+  }
+  *{ box-sizing:border-box; }
+  html, body{ height:100%; margin:0; }
+  body{
+    background: var(--paper); color: var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom: 30px;
+  }
+  .wrap{ max-width:440px; margin:0 auto; padding: 0 16px; }
+  header{
+    position:relative;
+    background: linear-gradient(165deg, #17203a 0%, #0F2A5C 55%, #081833 100%);
+    color:#fff; padding: 40px 24px 46px; text-align:center;
+    border-bottom: 3px solid var(--brass);
+  }
+  header::after{
+    content:''; position:absolute; inset:0; pointer-events:none; opacity:0.06;
+    background-image: repeating-linear-gradient(135deg, #fff 0 2px, transparent 2px 14px);
+  }
+  header img{ height:56px; width:auto; margin-bottom:12px; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.35)); border-radius:12px; position:relative; z-index:2; }
+  header h1{ font-family:'Bitter',serif; font-size:1.3rem; margin:0; font-weight:800; position:relative; z-index:2; }
+  header p{ margin:4px 0 0; font-size:0.8rem; color:#C9D4E8; position:relative; z-index:2; }
+  .install-toggle-btn{
+    position:absolute; top:14px; left:14px;
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:#fff;
+    width:30px; height:30px; border-radius:50%; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .card{ background:#fff; border:1px solid var(--paper-line); border-radius:16px; padding:20px; margin-top:-30px; position:relative; z-index:5; box-shadow:var(--shadow-card); }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:0.78rem; font-weight:600; color:var(--muted); margin-bottom:6px; }
+  .field input{
+    width:100%; padding:13px 14px; border:1.5px solid var(--paper-line); border-radius:12px;
+    font-size:1rem; font-family:inherit; box-sizing:border-box;
+  }
+  .field input:focus{ outline:none; border-color:var(--brass); }
+  .btn-primary{
+    width:100%; padding:14px; background:linear-gradient(160deg,var(--brass-light),var(--brass-deep));
+    color:#2A2114; border:none; border-radius:12px; font-weight:700; font-size:1rem; cursor:pointer;
+  }
+  .btn-primary:active{ transform:scale(0.98); }
+  .error-text{ color:#B23B31; font-size:0.82rem; margin-top:8px; text-align:center; }
+
+  .section-label{ font-size:0.72rem; font-weight:700; letter-spacing:1.5px; color:var(--brass-deep); text-transform:uppercase; margin: 20px 0 12px; }
+  .trip-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:14px; padding:16px; margin-bottom:12px;
+  }
+  .trip-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .trip-head h3{ margin:0; font-size:0.98rem; color:var(--ink-dark); font-family:'Bitter',serif; }
+  .info-row{ display:flex; align-items:flex-start; gap:8px; font-size:0.85rem; padding:6px 0; border-bottom:1px dashed var(--paper-line); }
+  .info-row:last-child{ border-bottom:none; }
+  .info-row .lbl{ color:var(--muted); min-width:64px; flex-shrink:0; font-size:0.72rem; padding-top:1px; }
+  .info-row .val{ flex:1; font-weight:600; color:var(--ink-dark); }
+  .info-row .val a{ color:var(--ink-dark); }
+  .call-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; margin-top:10px; padding:10px; background:var(--paid); color:#fff;
+    border-radius:10px; text-decoration:none; font-weight:700; font-size:0.85rem;
+  }
+  .empty-note{ font-size:0.82rem; color:var(--muted); text-align:center; padding:20px 0; }
+  .back-link{ display:block; text-align:center; margin-top:22px; color:var(--muted); font-size:0.82rem; text-decoration:none; }
+
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:999;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay .modal-card{ background:#fff; border-radius:16px; max-width:400px; width:100%; padding:22px; }
+  .modal-close-btn{
+    width:100%; margin-top:16px; background:var(--paper); border:1px solid var(--paper-line);
+    border-radius:10px; padding:11px; font-weight:600; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button type="button" id="installBtn" class="install-toggle-btn" aria-label="Install App" style="display:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+  <img src="logo-header.png" alt="Logo" onerror="this.style.display='none'">
+  <h1>DAXON MOBILITY</h1>
+  <p>School Portal</p>
+</header>
+
+<div class="wrap">
+
+  <div class="card" id="loginScreen">
+    <div class="field">
+      <label>Registered Mobile Number</label>
+      <input type="tel" id="phoneInput" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric">
+    </div>
+    <button type="button" class="btn-primary" id="loginBtn">Login</button>
+    <div class="error-text" id="loginError"></div>
+  </div>
+
+  <div id="dashScreen" style="display:none;">
+    <div class="card">
+      <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.15rem;color:var(--ink-dark);" id="schoolName">—</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-top:2px;">Van, driver contact &amp; stop counts</div>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-top:16px;">
+        <input type="date" id="dateFilter" style="flex:1;padding:10px 12px;border:1.5px solid var(--paper-line);border-radius:10px;font-family:inherit;font-size:0.86rem;">
+        <button type="button" id="todayBtn" style="padding:10px 14px;background:var(--paper);border:1px solid var(--paper-line);border-radius:10px;font-weight:600;font-size:0.8rem;cursor:pointer;">Today</button>
+      </div>
+
+      <div class="section-label" style="margin-top:16px;">Vans</div>
+      <div id="tripsList"></div>
+
+      <a href="#" class="back-link" id="backBtn">← Log out</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="reportIssueOverlay">
+  <div class="modal-card">
+    <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.05rem;color:var(--ink-dark);margin-bottom:4px;">Report an Issue</div>
+    <div style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;" id="issueVehicleLabel"></div>
+    <input type="hidden" id="issueVehicleId">
+    <div class="field">
+      <label>Message (e.g. "Ek bachcha beech mein utar gaya")</label>
+      <input type="text" id="issueMessageInput" placeholder="Type here...">
+    </div>
+    <div id="issueStatusMsg" style="text-align:center;font-size:0.82rem;margin-bottom:10px;min-height:18px;"></div>
+    <button type="button" class="btn-primary" id="submitIssueBtn">Send to Office &amp; Driver</button>
+    <button type="button" class="modal-close-btn" data-close="reportIssueOverlay">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="installOverlay">
+  <div class="modal-card">
+    <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.05rem;color:var(--ink-dark);margin-bottom:14px;">Install App</div>
+    <div style="font-size:0.86rem;color:var(--text);line-height:1.7;">
+      Is portal ko apne phone ki Home Screen par ek app ki tarah add karein:<br><br>
+      <b>Android (Chrome):</b> Upar-right corner mein <b>⋮</b> (teen dot) menu par tap karein, phir <b>"Add to Home screen"</b> ya <b>"Install app"</b> choose karein.<br><br>
+      <b>iPhone (Safari):</b> Neeche Share icon <b>⬆</b> par tap karein, phir <b>"Add to Home Screen"</b> choose karein.
+    </div>
+    <button type="button" id="installOverlayClose" class="modal-close-btn">Got it</button>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDzABowWH-8LZrRhrIssvDhL4mfVT_DXOk",
+    authDomain: "van-register.firebaseapp.com",
+    databaseURL: "https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "van-register",
+    storageBucket: "van-register.firebasestorage.app",
+    messagingSenderId: "89738000508",
+    appId: "1:89738000508:web:1ef2cbd3093dcb273131f9"
+  };
+  const fbApp = initializeApp(firebaseConfig);
+  // App Check — makes sure only our real, deployed apps can talk to
+  // Firebase (blocks scripts/bots hitting the database directly).
+  const appCheck = initializeAppCheck(fbApp, {
+    provider: new ReCaptchaV3Provider('6LctvKgtAAAAACjX8ZkGDa0fazUdW1oTUNL8WwlE'),
+    isTokenAutoRefreshEnabled: true
+  });
+  const fbAuth = getAuth(fbApp);
+
+  window.__firebaseAuthReady = new Promise((resolve, reject)=>{
+    let settled = false;
+    onAuthStateChanged(fbAuth, (user)=>{ if(user && !settled){ settled = true; resolve(user); } });
+    signInAnonymously(fbAuth).catch(e=>{
+      console.error('Firebase anonymous sign-in failed:', e);
+      if(!settled){ settled = true; reject(e); }
+    });
+    setTimeout(()=>{
+      if(!settled){ settled = true; reject(new Error('Firebase auth timed out')); }
+    }, 30000);
+  });
+
+  window.getFirebaseAuthToken = async function(){
+    const user = await window.__firebaseAuthReady;
+    return await user.getIdToken();
+  };
+
+  window.authedFetch = async function(url, options){
+    const token = await window.getFirebaseAuthToken();
+    const sep = url.includes('?') ? '&' : '?';
+    return fetch(`${url}${sep}auth=${token}`, options);
+  };
+</script>
+<script>
+
+async function waitForAuthedFetch(timeoutMs){
+  timeoutMs = timeoutMs || 15000;
+  const start = Date.now();
+  while(typeof window.authedFetch !== 'function'){
+    if(Date.now() - start > timeoutMs){
+      throw new Error('Firebase script did not finish loading (slow/no internet)');
+    }
+    await new Promise(r => setTimeout(r, 100));
+  }
+  return window.authedFetch;
+}
+
+const FIREBASE_DB_URL = 'https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+let state = { schools: [], students: [], vehicles: [], drivers: [], schoolMessages: [], routes: [], stopAttendance: [] };
+let currentSchool = null;
+let fullRawDriverState = null; // keeps EVERY field from driverData.json intact — saves stay surgical
+
+async function loadData(){
+  try{
+    const res = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/data.json`);
+    const raw = await res.json();
+    if(raw && raw.value){
+      const parsed = JSON.parse(raw.value);
+      state.schools = parsed.schools || [];
+      state.students = parsed.students || [];
+      state.vehicles = parsed.vehicles || [];
+    }
+  }catch(e){
+    console.error('Load failed', e);
+    throw e;
+  }
+  try{
+    const res2 = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/driverData.json`);
+    const raw2 = await res2.json();
+    if(raw2 && raw2.value){
+      const parsed2 = JSON.parse(raw2.value);
+      fullRawDriverState = parsed2;
+      state.drivers = parsed2.drivers || [];
+      state.schoolMessages = parsed2.schoolMessages || [];
+      state.routes = parsed2.routes || [];
+      state.stopAttendance = parsed2.stopAttendance || [];
+    }
+  }catch(e){
+    console.log('Driver info load failed (non-fatal):', e);
+  }
+}
+
+// ---------- Data-loss safety guard (same pattern used across the suite) ----------
+async function isDangerousEmptyDriverOverwrite(payload){
+  try{
+    const newCount = Array.isArray(payload.drivers) ? payload.drivers.length : 0;
+    if(newCount > 0) return false;
+    const fn = await waitForAuthedFetch(5000);
+    const res = await fn(`${FIREBASE_DB_URL}/driverData.json`);
+    if(res && res.ok){
+      const data = await res.json();
+      if(data && data.value){
+        const prev = JSON.parse(data.value);
+        const prevCount = Array.isArray(prev.drivers) ? prev.drivers.length : 0;
+        return prevCount >= 3;
+      }
+    }
+    return false;
+  }catch(e){ return false; }
+}
+
+async function saveSchoolMessage(vehicleId, message){
+  if(!fullRawDriverState || !currentSchool) return false;
+  if(await isDangerousEmptyDriverOverwrite(fullRawDriverState)) return false;
+  fullRawDriverState.schoolMessages = fullRawDriverState.schoolMessages || [];
+  // Drop anything older than 7 days so this list doesn't grow forever.
+  const cutoff = Date.now() - 7*24*60*60*1000;
+  fullRawDriverState.schoolMessages = fullRawDriverState.schoolMessages.filter(m => new Date(m.createdAt).getTime() > cutoff);
+  fullRawDriverState.schoolMessages.push({
+    id: 'schoolmsg_' + Date.now(),
+    schoolId: currentSchool.id,
+    schoolName: currentSchool.name,
+    vehicleId,
+    message,
+    createdAt: new Date().toISOString()
+  });
+  try{
+    const fn = await waitForAuthedFetch();
+    const res = await fn(`${FIREBASE_DB_URL}/driverData.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value: JSON.stringify(fullRawDriverState) })
+    });
+    if(!res.ok) throw new Error('Save failed');
+    state.schoolMessages = fullRawDriverState.schoolMessages;
+    return true;
+  }catch(e){
+    console.error('School message save failed', e);
+    return false;
+  }
+}
+
+function driverForVehicle(vehicleIdOrName){
+  if(!vehicleIdOrName) return null;
+  const v = state.vehicles.find(v=>v.name===vehicleIdOrName || v.id===vehicleIdOrName);
+  const matchKeys = v ? [v.id, v.name] : [vehicleIdOrName];
+  return (state.drivers || []).find(d => matchKeys.includes(d.vehicleId)) || null;
+}
+
+function todayDateKey(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function routesForVehicle(vehicleIdOrName){
+  if(!vehicleIdOrName) return [];
+  const v = state.vehicles.find(v=>v.name===vehicleIdOrName || v.id===vehicleIdOrName);
+  const matchKeys = v ? [v.id, v.name] : [vehicleIdOrName];
+  return (state.routes || []).filter(r => matchKeys.includes(r.vehicleId));
+}
+
+function renderTrips(){
+  const dateFilter = document.getElementById('dateFilter');
+  if(!dateFilter.value) dateFilter.value = todayDateKey();
+  const selectedDate = dateFilter.value;
+
+  // Every distinct vehicle carrying at least one student of this school.
+  const schoolStudents = state.students.filter(s => s.schoolId === currentSchool.id);
+  const vehicleIds = [...new Set(schoolStudents.map(s => s.vehicleId).filter(Boolean))];
+
+  const listEl = document.getElementById('tripsList');
+  if(vehicleIds.length === 0){
+    listEl.innerHTML = '<div class="empty-note">Is school ke liye abhi koi van assign nahi hai.</div>';
+    return;
+  }
+
+  listEl.innerHTML = vehicleIds.map(vid => {
+    const v = state.vehicles.find(v => v.id === vid || v.name === vid);
+    const vehicleLabel = v ? v.name : vid;
+    const driver = driverForVehicle(vid);
+    const routes = routesForVehicle(vid);
+
+    // Exactly the same route name, stop name, and count the driver entered.
+    let stopsHtml = '';
+    if(routes.length > 0){
+      const routeIds = routes.map(r => r.id);
+      const dayEntries = (state.stopAttendance || []).filter(a => routeIds.includes(a.routeId) && a.date === selectedDate);
+      if(dayEntries.length > 0){
+        const byRoute = {};
+        dayEntries.forEach(e=>{
+          const key = e.routeId || e.routeName;
+          if(!byRoute[key]) byRoute[key] = { routeName: e.routeName || 'Route', entries: [] };
+          byRoute[key].entries.push(e);
+        });
+        stopsHtml = Object.values(byRoute).map(grp => `
+          <div style="margin-top:14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-weight:700;color:var(--ink-dark);font-family:'Bitter',serif;font-size:0.92rem;">${grp.routeName}</span>
+              <span style="font-size:0.62rem;color:var(--muted);font-weight:700;text-transform:uppercase;">No of Students</span>
+            </div>
+            ${grp.entries.sort((a,b)=>a.stopIndex-b.stopIndex).map(e => `
+              <div class="info-row"><span class="lbl" style="min-width:auto;flex:1;">${e.stopName}</span><span class="val" style="flex:none;">${e.count}</span></div>
+            `).join('')}
+          </div>
+        `).join('');
+      } else {
+        stopsHtml = `<div style="font-size:0.78rem;color:var(--muted);margin-top:10px;">Is din ke liye abhi tak koi count nahi bhara gaya.</div>`;
+      }
+    }
+
+    return `
+    <div class="trip-card">
+      <div class="trip-head">
+        <h3>${vehicleLabel}</h3>
+      </div>
+      ${driver ? `
+        <div class="info-row"><span class="lbl">Driver</span><span class="val">${driver.name}</span></div>
+        ${driver.phone ? `<div class="info-row"><span class="lbl">Phone</span><span class="val"><a href="tel:${driver.phone}">${driver.phone}</a></span></div>` : ''}
+      ` : `<div class="info-row"><span class="lbl">Driver</span><span class="val">Not assigned</span></div>`}
+      ${(driver && driver.phone) ? `<a class="call-btn" href="tel:${driver.phone}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Call Driver
+      </a>` : ''}
+      ${stopsHtml}
+      <button type="button" class="report-issue-btn" data-vehicle-id="${v ? v.id : vid}" data-vehicle-label="${vehicleLabel.replace(/"/g,'&quot;')}" style="width:100%;margin-top:12px;background:var(--paper);border:1px solid var(--paper-line);color:#96650F;font-weight:700;font-size:0.82rem;padding:10px;border-radius:10px;cursor:pointer;">⚠️ Report an Issue (e.g. child left mid-route)</button>
+    </div>`;
+  }).join('');
+
+  document.querySelectorAll('.report-issue-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('issueVehicleId').value = btn.dataset.vehicleId;
+      document.getElementById('issueVehicleLabel').textContent = btn.dataset.vehicleLabel;
+      document.getElementById('issueMessageInput').value = '';
+      document.getElementById('issueStatusMsg').textContent = '';
+      document.getElementById('reportIssueOverlay').style.display = 'flex';
+    });
+  });
+}
+
+function showDashboard(school){
+  currentSchool = school;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashScreen').style.display = 'block';
+  document.getElementById('schoolName').textContent = school.name;
+  renderTrips();
+}
+
+document.getElementById('dateFilter').addEventListener('change', renderTrips);
+document.getElementById('todayBtn').addEventListener('click', ()=>{
+  document.getElementById('dateFilter').value = todayDateKey();
+  renderTrips();
+});
+
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const phone = document.getElementById('phoneInput').value.trim();
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  if(!/^\d{10}$/.test(phone)){
+    errEl.textContent = 'Kripya 10 ankon ka sahi mobile number daalein.';
+    return;
+  }
+  document.getElementById('loginBtn').textContent = 'Checking…';
+  document.getElementById('loginBtn').disabled = true;
+  try{
+    await loadData();
+    const school = state.schools.find(sc =>
+      (sc.phone||'').split(',').map(p=>p.replace(/\D/g,'').slice(-10)).includes(phone)
+    );
+    if(!school){
+      errEl.textContent = 'Ye number kisi school se match nahi hua. Office se sampark karein.';
+    } else {
+      showDashboard(school);
+    }
+  }catch(e){
+    errEl.textContent = '⚠️ Internet check karke dobara koshish karein.';
+  }
+  document.getElementById('loginBtn').textContent = 'Login';
+  document.getElementById('loginBtn').disabled = false;
+});
+
+document.querySelectorAll('[data-close]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.getElementById(btn.dataset.close).style.display = 'none';
+  });
+});
+
+document.getElementById('submitIssueBtn').addEventListener('click', async ()=>{
+  const statusEl = document.getElementById('issueStatusMsg');
+  const btn = document.getElementById('submitIssueBtn');
+  const vehicleId = document.getElementById('issueVehicleId').value;
+  const message = document.getElementById('issueMessageInput').value.trim();
+  if(!message){
+    statusEl.style.color = '#B23B31';
+    statusEl.textContent = 'Kripya message likhein.';
+    return;
+  }
+  btn.disabled = true;
+  statusEl.style.color = 'var(--muted)';
+  statusEl.textContent = 'Sending…';
+  const ok = await saveSchoolMessage(vehicleId, message);
+  btn.disabled = false;
+  if(ok){
+    statusEl.style.color = 'var(--paid)';
+    statusEl.textContent = '✓ Office aur driver ko bhej diya gaya.';
+    setTimeout(()=>{ document.getElementById('reportIssueOverlay').style.display = 'none'; }, 1400);
+  } else {
+    statusEl.style.color = '#B23B31';
+    statusEl.textContent = '⚠️ Bhej nahi paaya — internet check karke dobara koshish karein.';
+  }
+});
+
+document.getElementById('backBtn').addEventListener('click', (e)=>{
+  e.preventDefault();
+  document.getElementById('dashScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'block';
+  document.getElementById('phoneInput').value = '';
+});
+
+// ---------- Install App (Add to Home Screen) ----------
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(e=>console.log('Service worker registration failed:', e));
+}
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('installBtn').style.display = 'flex';
+});
+window.addEventListener('appinstalled', ()=>{
+  document.getElementById('installBtn').style.display = 'none';
+});
+const isStandaloneSchool = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+if(!isStandaloneSchool){
+  setTimeout(()=>{
+    if(document.getElementById('installBtn').style.display === 'none'){
+      document.getElementById('installBtn').style.display = 'flex';
+    }
+  }, 800);
+}
+document.getElementById('installBtn').addEventListener('click', async ()=>{
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+  } else {
+    document.getElementById('installOverlay').style.display = 'flex';
+  }
+});
+document.getElementById('installOverlayClose').addEventListener('click', ()=>{
+  document.getElementById('installOverlay').style.display = 'none';
+});
+</script>
+</body>
+</html>
