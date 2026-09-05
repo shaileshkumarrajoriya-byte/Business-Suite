@@ -1,0 +1,2547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d1626">
+<link rel="manifest" href="manifest-parent.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fee Portal">
+<title>Fee Status — DAXON MOBILITY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --ink: #0F2A5C;
+    --ink-dark: #0F2A5C;
+    --paper: #FBF9F4;
+    --paper-line: #E7E1D3;
+    --brass: #D4AF37;
+    --brass-deep: #A8791C;
+    --brass-light: #F0D687;
+    --action: #0E9F6E;
+    --action-deep: #076E4C;
+    --action-light: #6FD9B5;
+    --paid: #3F7859;
+    --paid-bg: #E4EFE8;
+    --due: #B23B31;
+    --due-bg: #F7E6E3;
+    --warn: #96650F;
+    --warn-bg: #FCEFD9;
+    --text: #2B2E33;
+    --muted: #6B7280;
+    --shadow-card: 0 1px 2px rgba(20,15,5,0.05), 0 14px 32px rgba(20,15,5,0.09);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body{ height:100%; margin:0; }
+  body{
+    background: var(--paper); color: var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    padding-bottom: 30px;
+  }
+  header{
+    position:relative;
+    background: radial-gradient(circle at 50% 0%, rgba(212,175,55,0.16), transparent 55%),
+      linear-gradient(165deg, #17203a 0%, #0d1626 60%, #050810 100%);
+    color:#fff; padding: 24px 20px 30px; text-align:center;
+    border-bottom: 3px solid var(--brass);
+  }
+  .lang-toggle-btn{
+    position:absolute; top:14px; right:14px;
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:#fff;
+    font-size:0.72rem; font-weight:700; padding:6px 11px; border-radius:20px; cursor:pointer;
+    letter-spacing:0.3px;
+  }
+  .lang-toggle-btn:active{ transform:scale(0.94); }
+  .install-toggle-btn{
+    position:absolute; top:14px; left:14px;
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:#fff;
+    width:30px; height:30px; border-radius:50%; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .install-toggle-btn:active{ transform:scale(0.9); }
+  header img{
+    height:56px; width:auto; margin-bottom:10px;
+  }
+  header h1{
+    font-family:'Bitter',serif; font-weight:800; font-size:1.15rem; margin:0 0 4px;
+    color:#F1F3F8; letter-spacing:0.2px;
+  }
+  header p{ margin:0; font-size:0.72rem; color:#9FB8DD; letter-spacing:1px; text-transform:uppercase; }
+
+  .wrap{ max-width:440px; margin:0 auto; padding: 0 16px; }
+
+  /* ---------- Login screen ---------- */
+  #loginScreen{ padding-top: 34px; }
+  .login-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:20px;
+    padding:28px 22px; box-shadow: var(--shadow-card); text-align:center;
+  }
+  .login-icon{
+    width:64px; height:64px; border-radius:50%; margin:0 auto 16px;
+    background: linear-gradient(155deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+    display:flex; align-items:center; justify-content:center; color:#fff;
+    box-shadow: 0 8px 20px rgba(212,175,55,0.3);
+  }
+  .login-card h2{ font-family:'Bitter',serif; font-size:1.15rem; margin:0 0 6px; color:var(--ink-dark); }
+  .login-card p{ font-size:0.82rem; color:var(--muted); margin:0 0 20px; line-height:1.5; }
+  .phone-input-row{
+    display:flex; align-items:center; border:1.5px solid var(--paper-line); border-radius:12px;
+    overflow:hidden; margin-bottom:14px;
+  }
+  .phone-prefix{ padding:13px 10px 13px 14px; color:var(--muted); font-weight:600; background:#FAF8F2; border-right:1px solid var(--paper-line); }
+  #phoneInput{
+    flex:1; border:none; outline:none; padding:13px 12px; font-size:1rem;
+    font-family:'JetBrains Mono',monospace; letter-spacing:1px;
+  }
+  #loginBtn{
+    width:100%; background: linear-gradient(160deg, var(--action-light) 0%, var(--action) 45%, var(--action-deep) 100%);
+    color:#fff; border:none; padding:14px; border-radius:12px; font-weight:700; font-size:0.95rem;
+    cursor:pointer; box-shadow: 0 6px 18px rgba(14,159,110,0.28);
+  }
+  #loginBtn:active{ transform:scale(0.98); }
+  #loginError{ color:var(--due); font-size:0.82rem; margin-top:12px; min-height:18px; }
+  #pinOnlyLoginBtn{
+    width:100%; background: linear-gradient(160deg, var(--action-light) 0%, var(--action) 45%, var(--action-deep) 100%);
+    color:#fff; border:none; padding:14px; border-radius:12px; font-weight:700; font-size:0.95rem;
+    cursor:pointer; box-shadow: 0 6px 18px rgba(14,159,110,0.28);
+  }
+  #pinOnlyLoginBtn:active{ transform:scale(0.98); }
+  #loginLoading{ display:none; color:var(--muted); font-size:0.82rem; margin-top:12px; }
+
+  #policyAcceptContinueBtn{
+    width:100%; background: linear-gradient(160deg, var(--action-light) 0%, var(--action) 45%, var(--action-deep) 100%);
+    color:#fff; border:none; padding:14px; border-radius:12px; font-weight:700; font-size:0.95rem;
+    cursor:pointer; box-shadow: 0 6px 18px rgba(14,159,110,0.28);
+  }
+  #policyAcceptContinueBtn:not(:disabled):active{ transform:scale(0.98); }
+
+  /* ---------- Child picker (if multiple kids share a phone) ---------- */
+  #pickerScreen{ display:none; padding-top:24px; }
+  .picker-title{ font-family:'Bitter',serif; font-weight:700; font-size:1.05rem; margin: 4px 4px 14px; color:var(--ink-dark); }
+  .picker-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:16px; padding:16px;
+    display:flex; align-items:center; gap:12px; margin-bottom:12px; cursor:pointer;
+    box-shadow: var(--shadow-card);
+  }
+  .picker-card:active{ transform:scale(0.98); }
+  .picker-avatar{
+    width:44px; height:44px; border-radius:50%; flex-shrink:0; object-fit:cover;
+    background: linear-gradient(155deg, var(--brass-light), var(--brass));
+  }
+  .picker-avatar-placeholder{
+    width:44px; height:44px; border-radius:50%; flex-shrink:0;
+    background: linear-gradient(155deg, var(--brass-light), var(--brass));
+    display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700;
+  }
+  .picker-name{ font-weight:700; color:var(--ink-dark); font-size:0.95rem; }
+  .picker-meta{ font-size:0.76rem; color:var(--muted); margin-top:2px; }
+
+  /* ---------- Dashboard ---------- */
+  #dashScreen{ display:none; padding-top:20px; }
+  .back-row{ display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+  .back-btn{
+    background:#fff; border:1px solid var(--paper-line); border-radius:10px; width:36px; height:36px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink-dark);
+  }
+  .student-head{
+    position:relative;
+    padding:15px 16px 13px;
+    background: linear-gradient(155deg, #232019 0%, #16130d 55%, #0a0906 100%);
+    display:flex; align-items:center; gap:12px;
+    border-radius:18px 18px 0 0; overflow:hidden;
+  }
+  .student-head::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; height:3px;
+    background: linear-gradient(90deg, var(--brass-deep), var(--brass), var(--brass-light));
+  }
+  .student-photo{
+    width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;
+    border:2px solid var(--brass-light); box-shadow:0 4px 10px rgba(0,0,0,0.4);
+  }
+  .student-photo-placeholder{
+    width:48px;height:48px;border-radius:50%;flex-shrink:0;
+    background: linear-gradient(155deg,#A9C2E8 0%,#2F5DA8 55%,#1B3A6B 100%);
+    display:flex;align-items:center;justify-content:center;color:#0d1626;
+    border:2px solid var(--brass-light); box-shadow:0 4px 10px rgba(0,0,0,0.4);
+  }
+  .student-id-chip{
+    font-family:'JetBrains Mono',monospace; font-size:0.66rem; font-weight:700;
+    color:#0d1626; background: var(--brass-light); padding:1px 6px; border-radius:5px;
+    margin-right:6px; vertical-align:1px;
+  }
+  .student-name{ font-family:'Bitter',serif; font-weight:700; font-size:1.03rem; color:#EFF3FA; line-height:1.3; }
+  .student-sub{ font-size:0.72rem; color:#8FA5C9; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .student-fee-pill{ margin-left:auto; flex-shrink:0; text-align:right; }
+  .student-fee-amt{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:0.95rem; color:#F0D687; }
+  .student-fee-label{ font-size:0.6rem; color:#8a7a55; letter-spacing:0.3px; text-transform:uppercase; margin-top:1px; }
+  .student-info-rows{ background:#fff; border:1px solid var(--paper-line); border-top:none; padding:12px 16px 4px; }
+  .student-info-row{
+    display:flex; align-items:flex-start; gap:8px;
+    font-size:0.82rem; color:var(--text); padding:6px 0;
+    border-bottom:1px dashed var(--paper-line);
+  }
+  .student-info-row:last-child{ border-bottom:none; }
+  .student-info-row .si-label{ color:var(--muted); min-width:58px; flex-shrink:0; font-size:0.72rem; padding-top:1px; }
+  .student-info-row .si-value{ flex:1; font-weight:600; color:var(--ink-dark); }
+  .student-card-body{
+    background:#fff; border:1px solid var(--paper-line); border-top:none; border-radius:0 0 18px 18px;
+    padding:18px; box-shadow: var(--shadow-card); margin-bottom:18px;
+  }
+  .due-banner{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background: var(--due-bg); border-radius:12px; padding:14px 16px; margin-bottom:16px;
+  }
+  .due-banner.clear{ background: var(--paid-bg); }
+  .due-label{ font-size:0.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .due-amount{ font-family:'JetBrains Mono',monospace; font-weight:800; font-size:1.5rem; color:var(--due); }
+  .due-banner.clear .due-amount{ color:var(--paid); }
+  .section-label{ font-size:0.72rem; font-weight:700; letter-spacing:1.5px; color:var(--brass-deep); text-transform:uppercase; margin: 4px 0 12px; }
+  .month-table{ width:100%; border-collapse:collapse; margin-bottom:8px; }
+  .month-table th{
+    font-size:0.64rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px;
+    text-align:left; padding:6px 4px; border-bottom:1.5px solid var(--paper-line);
+  }
+  .month-table td{ padding:9px 4px; border-bottom:1px dashed var(--paper-line); font-size:0.78rem; vertical-align:middle; }
+  .month-table tr:last-child td{ border-bottom:none; }
+  .mt-pay-btn{
+    background: linear-gradient(160deg, var(--action-light) 0%, var(--action) 45%, var(--action-deep) 100%);
+    color:#fff; border:none; border-radius:8px; padding:6px 10px; font-size:0.68rem; font-weight:700;
+    cursor:pointer; white-space:nowrap;
+  }
+  .mt-pay-btn:active{ transform:scale(0.94); }
+  .mt-pay-btn.advance{
+    background:#fff; color:var(--brass-deep); border:1.3px solid var(--brass-light);
+  }
+  .mt-status{
+    display:inline-block; font-size:0.64rem; font-weight:700; padding:3px 8px; border-radius:20px;
+  }
+  .mt-status.paid{ background:var(--paid-bg); color:var(--paid); }
+  .mt-status.partial{ background:var(--warn-bg); color:var(--warn); }
+  .mt-status.due{ background:var(--due-bg); color:var(--due); }
+  .mt-status.upcoming{ background:#F0EDE3; color:var(--muted); }
+  .mt-amount{ font-family:'JetBrains Mono',monospace; font-weight:700; }
+  .mt-amount.paid-col{ color:var(--paid); }
+  .mt-amount.due-col{ color:var(--due); }
+  .mt-date{ color:var(--muted); font-size:0.7rem; }
+  .late-fee-note{ display:block; color:var(--due); font-size:0.62rem; font-weight:700; margin-top:1px; }
+
+  .bill-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:12px; padding:12px 14px;
+    display:flex; align-items:center; gap:10px; margin-bottom:8px;
+  }
+  .bill-icon{
+    width:34px; height:34px; border-radius:9px; flex-shrink:0; background:var(--paper);
+    display:flex; align-items:center; justify-content:center; color:var(--brass-deep);
+  }
+  .bill-no{ font-weight:700; font-size:0.82rem; color:var(--ink-dark); }
+  .bill-meta{ font-size:0.72rem; color:var(--muted); margin-top:2px; }
+  .bill-amt{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:0.85rem; color:var(--ink-dark); margin-left:auto; text-align:right; }
+  .bill-view-btn{
+    background:var(--paper); border:1px solid var(--paper-line); color:var(--brass-deep);
+    border-radius:8px; padding:5px 10px; font-size:0.7rem; font-weight:700; cursor:pointer; margin-top:4px;
+  }
+  .empty-note{ font-size:0.8rem; color:var(--muted); text-align:center; padding:14px 0; }
+  .contact-note{ text-align:center; font-size:0.74rem; color:var(--muted); margin-top:14px; line-height:1.5; }
+  .contact-note a{ color:var(--brass-deep); font-weight:600; text-decoration:none; }
+
+  .contact-btn-row{ display:flex; gap:10px; margin: 4px 0 18px; }
+  .contact-btn{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:13px 8px; border-radius:12px; border:1.5px solid var(--paper-line);
+    background:#fff; text-decoration:none; cursor:pointer; font-family:inherit;
+  }
+  .contact-btn:active{ transform:scale(0.96); }
+  .contact-btn.call{ color:var(--brass-deep); border-color:var(--brass-light); }
+  .contact-btn.whatsapp{ color:#1f8a4c; border-color:#bfe6cf; }
+  .contact-btn span{ font-size:0.74rem; font-weight:700; }
+
+  .instructions-box{
+    background: linear-gradient(180deg, #FBF9F4 0%, #F5F1E6 100%);
+    border:1px solid var(--paper-line); border-radius:14px; padding:16px;
+    margin-top:18px;
+  }
+  .instructions-title{
+    display:flex; align-items:center; gap:8px; font-family:'Bitter',serif; font-weight:700;
+    font-size:0.9rem; color:var(--ink-dark); margin-bottom:10px;
+  }
+  .instructions-box ul{ margin:0; padding-left:20px; }
+  .instructions-box li{ font-size:0.8rem; color:var(--text); line-height:1.7; }
+  .pa-item{ padding:10px 0; border-bottom:1px dashed var(--paper-line); }
+  .pa-item:last-child{ border-bottom:none; }
+  .pa-item-text{ font-size:0.82rem; color:var(--text); line-height:1.6; white-space:pre-wrap; }
+  .pa-item-date{ font-size:0.68rem; color:var(--muted); margin-top:5px; }
+  .pa-empty{ font-size:0.8rem; color:var(--muted); text-align:center; padding:6px 0; }
+
+  .pq-row{ display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin: 4px 0 18px; }
+  .pq-btn{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:8px;
+    background:#fff; border:1px solid var(--paper-line); border-radius:14px; padding:14px 6px;
+    cursor:pointer; box-shadow: var(--shadow-card); position:relative; font-family:inherit;
+  }
+  .pq-btn:active{ transform:scale(0.96); }
+  .pq-icon{
+    width:42px; height:42px; border-radius:50%;
+    background: linear-gradient(155deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 4px 10px rgba(212,175,55,0.3);
+  }
+  .pq-label{ font-size:0.72rem; font-weight:700; color:var(--ink-dark); text-align:center; }
+  .pq-badge{
+    position:absolute; top:6px; right:10px; background:var(--due); color:#fff;
+    font-size:0.6rem; font-weight:800; padding:2px 6px; border-radius:10px; line-height:1.3;
+  }
+
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:999;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-card{
+    background:#fff; border-radius:16px; max-width:400px; width:100%;
+    padding:22px; max-height:82vh; overflow-y:auto;
+  }
+  .modal-card-title{
+    font-family:'Bitter',serif; font-weight:800; font-size:1.05rem; color:var(--ink-dark);
+    margin-bottom:14px; display:flex; align-items:center; gap:8px;
+  }
+  .modal-close-btn{
+    width:100%; margin-top:16px; background:var(--paper); border:1px solid var(--paper-line);
+    border-radius:10px; padding:11px; font-weight:600; cursor:pointer;
+  }
+  .pay-info-icon{
+    width:56px; height:56px; border-radius:50%; margin:0 auto 14px;
+    background: linear-gradient(155deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 8px 20px rgba(212,175,55,0.3);
+  }
+  .pay-info-months{ font-size:0.82rem; color:var(--muted); font-weight:600; margin-bottom:4px; line-height:1.5; }
+  .pay-info-amount{ font-family:'JetBrains Mono',monospace; font-weight:800; font-size:2rem; color:var(--ink-dark); }
+  .pay-info-note{ font-size:0.76rem; color:var(--brass-deep); font-weight:600; margin-top:6px; line-height:1.5; }
+  .pay-info-soon{
+    display:inline-flex; align-items:center; background:var(--paper); color:var(--brass-deep);
+    font-size:0.78rem; font-weight:700; padding:7px 14px; border-radius:20px;
+  }
+
+  .ei-photo-row{ display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+  .ei-photo-preview{ width:56px; height:56px; border-radius:50%; object-fit:cover; border:2px solid var(--brass-light); }
+  .ei-photo-placeholder{
+    width:56px; height:56px; border-radius:50%; flex-shrink:0;
+    background: linear-gradient(155deg, var(--brass-light), var(--brass), var(--brass-deep));
+    display:flex; align-items:center; justify-content:center; color:#fff;
+  }
+  .ei-photo-upload-btn{
+    background:var(--paper); border:1px solid var(--paper-line); color:var(--brass-deep);
+    padding:9px 14px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer;
+  }
+  .ei-field{ margin-bottom:12px; text-align:left; }
+  .ei-field label{ display:block; font-size:0.74rem; color:var(--muted); margin-bottom:4px; font-weight:600; }
+  .ei-field input, .ei-field select{
+    width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid var(--paper-line);
+    border-radius:9px; font-size:0.88rem; font-family:inherit; background:#fff; color:var(--ink-dark);
+  }
+  .btn-save-info{
+    width:100%; margin-top:8px;
+    background: linear-gradient(160deg, var(--action-light) 0%, var(--action) 45%, var(--action-deep) 100%);
+    color:#fff; border:none; padding:13px; border-radius:11px; font-weight:700; font-size:0.92rem; cursor:pointer;
+  }
+  .btn-save-info:active{ transform:scale(0.98); }
+  .payment-time{ font-size:0.62rem; color:var(--muted); display:block; }
+
+  footer{ text-align:center; font-size:0.7rem; color:var(--muted); margin-top:30px; padding: 0 20px; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <button type="button" id="langToggleBtn" class="lang-toggle-btn">हिं / EN</button>
+  <button type="button" id="installBtn" class="install-toggle-btn" aria-label="Install App" style="display:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+  <img src="logo-header.png" alt="Logo" onerror="this.style.display='none'">
+  <h1>DAXON MOBILITY</h1>
+  <p data-i18n="header_subtitle">Parent Fee Portal</p>
+</header>
+
+<div class="wrap">
+
+  <!-- Login -->
+  <div id="loginScreen">
+    <div class="login-card">
+      <div class="login-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </div>
+      <h2 data-i18n="login_title">Check Your Fee Status</h2>
+      <p data-i18n="login_desc">Enter your registered mobile number — the one we have on file for the van fee.</p>
+      <div class="phone-input-row">
+        <span class="phone-prefix">+91</span>
+        <input type="tel" id="phoneInput" data-i18n-placeholder="phone_placeholder" placeholder="10 digit number" maxlength="10" inputmode="numeric">
+      </div>
+      <input type="tel" id="pinInput" data-i18n-placeholder="pin_placeholder_login" placeholder="PIN (only if you've set one)" maxlength="4" inputmode="numeric" style="width:100%; box-sizing:border-box; padding:13px 14px; margin-bottom:14px; border:1.5px solid var(--paper-line); border-radius:12px; font-size:1rem; font-family:'JetBrains Mono',monospace; letter-spacing:2px;">
+      <button type="button" id="loginBtn" data-i18n="login_btn">Check</button>
+      <div id="loginLoading" data-i18n="login_loading">Searching…</div>
+      <div id="loginError"></div>
+    </div>
+    <div class="contact-note">
+      <span data-i18n="login_contact_note">Number not matching? Contact the office:</span><br>
+      <a href="tel:8103026611">8103026611</a> · <a href="tel:9183516611">9183516611</a>
+    </div>
+    <div id="openRegisterLink" style="text-align:center;margin-top:18px;font-size:0.82rem;color:var(--brass-deep);font-weight:700;text-decoration:underline;cursor:pointer;" data-i18n="register_new_student">New Student? Register Here</div>
+  </div>
+
+  <div id="pinOnlyScreen" style="display:none;">
+    <div class="login-card">
+      <div class="login-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      </div>
+      <h2>Welcome Back</h2>
+      <p>Apna 4-digit PIN daalein.</p>
+      <input type="tel" id="pinOnlyInput" placeholder="PIN" maxlength="4" inputmode="numeric" style="width:100%; box-sizing:border-box; padding:14px; margin-bottom:14px; border:1.5px solid var(--paper-line); border-radius:12px; font-size:1.3rem; font-family:'JetBrains Mono',monospace; letter-spacing:6px; text-align:center;">
+      <button type="button" id="pinOnlyLoginBtn">Login</button>
+      <div id="pinOnlyLoading" style="display:none;text-align:center;font-size:0.82rem;color:var(--muted);margin-top:10px;">Checking…</div>
+      <div id="pinOnlyError" style="text-align:center;font-size:0.82rem;color:var(--due);margin-top:10px;min-height:18px;"></div>
+    </div>
+    <div id="pinOnlySwitchLink" style="text-align:center;margin-top:18px;font-size:0.82rem;color:var(--brass-deep);font-weight:700;text-decoration:underline;cursor:pointer;">Not you? Login with different number</div>
+  </div>
+
+  <!-- Multiple children picker -->
+  <div id="pickerScreen">
+    <div class="picker-title" data-i18n="picker_title">Which child's fee status do you want to see?</div>
+    <div id="pickerList"></div>
+  </div>
+
+  <div id="policyAcceptScreen" style="display:none;padding-top:24px;">
+    <div class="login-card" style="text-align:left;">
+      <h2 style="text-align:center;">Van Fee Policy</h2>
+      <div id="policyAcceptText" style="max-height:48vh;overflow-y:auto;font-size:0.84rem;line-height:1.7;color:var(--text);border:1px solid var(--paper-line);border-radius:12px;padding:14px;margin:14px 0;background:var(--paper);white-space:pre-wrap;"></div>
+      <label style="display:flex;align-items:flex-start;gap:10px;font-size:0.84rem;cursor:pointer;margin-bottom:16px;">
+        <input type="checkbox" id="policyAcceptCheckbox" style="margin-top:3px;width:18px;height:18px;flex:none;">
+        <span>Maine policy pura padh liya hai aur main sehmat hoon.</span>
+      </label>
+      <button type="button" id="policyAcceptContinueBtn" disabled style="opacity:0.5;">Continue</button>
+      <div id="policyAcceptStatus" style="text-align:center;font-size:0.82rem;margin-top:10px;min-height:18px;"></div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashScreen">
+    <div class="back-row" style="justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button type="button" class="back-btn" id="backBtn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <div style="font-size:0.82rem;color:var(--muted);" data-i18n="go_back">Go back</div>
+      </div>
+      <button type="button" id="switchChildBtn" style="display:none;align-items:center;gap:6px;background:var(--brass-light);border:none;color:#2A2114;font-weight:700;font-size:0.78rem;padding:8px 12px;border-radius:20px;cursor:pointer;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        Switch Child
+      </button>
+    </div>
+
+    <div id="syncWarning" style="display:none;align-items:center;gap:8px;background:#FCEFD9;border:1.5px solid #E8CE7A;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:0.8rem;color:#96650F;font-weight:600;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+      <span>📴 Kuch data offline save hai — internet aate hi khud sync ho jayega</span>
+    </div>
+
+    <div class="student-head">
+      <img id="studentPhoto" class="student-photo" style="display:none;">
+      <div id="studentPhotoPlaceholder" class="student-photo-placeholder">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.3"/><path d="M5 20c0-3.4 3-6 7-6s7 2.6 7 6"/></svg>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div class="student-name"><span class="student-id-chip" id="studentIdChip">#1</span><span id="studentName">—</span></div>
+        <div class="student-sub" id="studentSub">—</div>
+      </div>
+      <div class="student-fee-pill">
+        <div class="student-fee-amt" id="studentFeeAmt">₹0</div>
+        <div class="student-fee-label" data-i18n="per_month">per month</div>
+      </div>
+    </div>
+
+    <div id="delayAlertBanner" style="display:none;background:#FCEFD9;border:1.5px solid #E8CE7A;border-radius:14px;padding:14px 16px;margin:0 0 4px;display:flex;gap:10px;align-items:flex-start;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#96650F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <div>
+        <div style="font-weight:700;color:#96650F;font-size:0.86rem;">Van Delayed</div>
+        <div id="delayAlertText" style="font-size:0.8rem;color:#7a5209;margin-top:2px;line-height:1.5;"></div>
+      </div>
+    </div>
+
+    <div class="student-info-rows" id="studentInfoRows"></div>
+
+    <a href="#" id="liveLocationBtn" target="_blank" rel="noopener" style="display:none;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;padding:12px;background:var(--paid);color:#fff;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.86rem;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span id="liveLocationBtnLabel">📍 View Van's Live Location</span>
+    </a>
+
+    <button type="button" id="openVanTimingBtn" style="display:none;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;padding:12px;background:#fff;border:1px solid var(--paper-line);color:var(--ink-dark);border-radius:12px;font-weight:700;font-size:0.86rem;cursor:pointer;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      🕒 View Van Timing
+    </button>
+
+    <div style="background:#fff;border:1px solid var(--paper-line);border-radius:14px;padding:14px 16px;margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <div>
+        <div style="font-weight:700;color:var(--ink-dark);font-size:0.86rem;" id="leaveStatusLabel">Aaj school jaa raha hai</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">Agar aaj chhutti hai, driver ko bata dein</div>
+      </div>
+      <button type="button" id="toggleLeaveBtn" style="flex:none;padding:9px 16px;border-radius:10px;font-weight:700;font-size:0.8rem;cursor:pointer;border:none;">Mark Absent</button>
+    </div>
+
+    <button type="button" id="openFeedbackBtn" style="width:100%;margin-top:10px;background:#fff;border:1px solid var(--paper-line);color:var(--ink-dark);font-weight:700;font-size:0.82rem;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Suggestion / Complaint
+    </button>
+
+    <button type="button" id="openMyFeedbackBtn" style="display:none;width:100%;margin-top:10px;background:#fff;border:1px solid var(--paper-line);color:var(--ink-dark);font-weight:700;font-size:0.82rem;padding:12px;border-radius:12px;cursor:pointer;align-items:center;justify-content:center;gap:8px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span id="myFeedbackBtnLabel">My Suggestions/Complaints</span>
+    </button>
+
+    <button type="button" id="openRentVehicleBtn" style="width:100%;margin-top:10px;background:linear-gradient(160deg,var(--brass-light),var(--brass-deep));border:none;color:#2A2114;font-weight:700;font-size:0.82rem;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 0 1-2-2v-2a2 2 0 0 1 .5-1.3L5.4 8.2A2 2 0 0 1 7 7.5h10a2 2 0 0 1 1.6.7l1.9 3.5a2 2 0 0 1 .5 1.3v2a2 2 0 0 1-2 2M5 17a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2M17 17a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2"/><circle cx="7" cy="17" r="1"/><circle cx="17" cy="17" r="1"/></svg>
+      Rent a Vehicle
+    </button>
+
+    <div class="student-card-body">
+      <div class="contact-btn-row">
+        <a href="tel:8103026611" class="contact-btn call">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span data-i18n="call">Call</span>
+        </a>
+        <a href="#" class="contact-btn whatsapp" id="whatsappBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.9 11.9L4 20l4.2-1.1a7.9 7.9 0 0 0 3.85 1h0a7.94 7.94 0 0 0 5.55-13.58zm-5.55 12.2h0a6.58 6.58 0 0 1-3.36-.92l-.24-.14-2.5.65.67-2.44-.16-.25a6.6 6.6 0 1 1 5.6 3.1zm3.6-4.94c-.2-.1-1.17-.58-1.35-.64s-.31-.1-.44.1-.5.64-.61.77-.23.15-.42.05a5.4 5.4 0 0 1-1.6-.98 5.9 5.9 0 0 1-1.1-1.36c-.11-.2 0-.3.1-.4s.2-.24.3-.36a1.3 1.3 0 0 0 .2-.34.37.37 0 0 0 0-.35c-.05-.1-.44-1.06-.6-1.45s-.32-.33-.44-.33h-.38a.72.72 0 0 0-.53.25 2.2 2.2 0 0 0-.68 1.63 3.8 3.8 0 0 0 .8 2.03 8.7 8.7 0 0 0 3.33 2.94c.47.2.83.32 1.12.41a2.7 2.7 0 0 0 1.24.08c.38-.06 1.17-.48 1.33-.94a1.65 1.65 0 0 0 .12-.94c-.05-.08-.18-.13-.38-.23z"/></svg>
+          <span>WhatsApp</span>
+        </a>
+      </div>
+
+      <div class="due-banner" id="dueBanner">
+        <div>
+          <div class="due-label" data-i18n="total_due">Total Due</div>
+          <div class="due-amount" id="dueAmount">₹0</div>
+        </div>
+        <svg id="dueIcon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--due);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+
+      <div class="section-label" style="margin-top:20px;" data-i18n="quick_access">Quick Access</div>
+      <div class="pq-row">
+        <button type="button" class="pq-btn" id="openFeeStatusBtn">
+          <span class="pq-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+          <span class="pq-label" data-i18n="fee_status_short">Fee Status</span>
+        </button>
+        <button type="button" class="pq-btn" id="openBillsBtn">
+          <span class="pq-badge" id="billsBadge" style="display:none;"></span>
+          <span class="pq-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+          <span class="pq-label" data-i18n="bills">Bills</span>
+        </button>
+        <button type="button" class="pq-btn" id="openAnnouncementsBtn">
+          <span class="pq-badge" id="announceBadge" style="display:none;"></span>
+          <span class="pq-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 0 1-5.8-1.6"/></svg></span>
+          <span class="pq-label" data-i18n="announcements">Announcements</span>
+        </button>
+        <button type="button" class="pq-btn" id="openPolicyBtn">
+          <span class="pq-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6"/><path d="M9 16h6"/><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="13 2 13 8 19 8"/></svg></span>
+          <span class="pq-label" data-i18n="policy">Policy</span>
+        </button>
+        <button type="button" class="pq-btn" id="openEditInfoBtn">
+          <span class="pq-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+          <span class="pq-label" data-i18n="edit_my_info">Edit My Info</span>
+        </button>
+        <button type="button" class="pq-btn" id="openPinBtn">
+          <span class="pq-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <span class="pq-label" id="pinBtnLabel" data-i18n="set_my_pin">Set My PIN</span>
+        </button>
+      </div>
+
+      <div class="contact-note"><span data-i18n="dash_contact_note">Having trouble with a payment? Contact the office:</span><br>
+        <a href="tel:8103026611">8103026611</a> · <a href="tel:9183516611">9183516611</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fee Status modal -->
+  <div class="modal-overlay" id="feeStatusOverlay">
+    <div class="modal-card">
+      <div class="modal-card-title">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span data-i18n="month_detail_section">Month-by-Month Detail</span>
+      </div>
+      <table class="month-table">
+        <thead>
+          <tr><th data-i18n="th_month">Month</th><th data-i18n="th_status">Status</th><th data-i18n="th_paid">Paid</th><th data-i18n="th_due">Due</th><th data-i18n="th_date">Date</th><th></th></tr>
+        </thead>
+        <tbody id="monthTableBody"></tbody>
+      </table>
+      <p style="font-size:0.68rem;color:var(--muted);margin:0 0 4px;" data-i18n="payment_soon_note">Online payment is coming soon — tapping "Pay" will show the office number for now.</p>
+      <button type="button" class="modal-close-btn" data-close="feeStatusOverlay" data-i18n="close">Close</button>
+    </div>
+  </div>
+
+  <!-- Bills modal -->
+  <div class="modal-overlay" id="billsOverlay">
+    <div class="modal-card">
+      <div class="modal-card-title">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span data-i18n="bills_receipts">Bills / Receipts</span>
+      </div>
+      <div id="billsList"></div>
+      <button type="button" class="modal-close-btn" data-close="billsOverlay" data-i18n="close">Close</button>
+    </div>
+  </div>
+
+  <!-- Announcements modal -->
+  <div class="modal-overlay" id="announcementsOverlay">
+    <div class="modal-card">
+      <div class="modal-card-title">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 0 1-5.8-1.6"/></svg>
+        <span data-i18n="general_announcements">General Announcements</span>
+      </div>
+      <div id="parentAnnouncementsList"></div>
+      <button type="button" class="modal-close-btn" data-close="announcementsOverlay" data-i18n="close">Close</button>
+    </div>
+  </div>
+
+  <!-- Policy modal -->
+  <div class="modal-overlay" id="vanTimingOverlay">
+    <div class="modal-card">
+      <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.05rem;color:var(--ink-dark);margin-bottom:4px;">Van Timing</div>
+      <p style="font-size:0.8rem;color:var(--muted);margin:0 0 14px;">Aapke gaon ki panktee (row) bold hai — waha van kab pahunchegi.</p>
+      <div id="vanTimingContent" style="max-height:55vh;overflow-y:auto;"></div>
+      <button type="button" class="modal-close-btn" data-close="vanTimingOverlay">Close</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="policyOverlay">
+    <div class="modal-card">
+      <div class="modal-card-title">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><path d="M9 12h6"/><path d="M9 16h6"/><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="13 2 13 8 19 8"/></svg>
+        <span data-i18n="van_fee_policy">Van Fee Policy</span>
+      </div>
+      <div id="policyContent" style="font-size:0.82rem; color:var(--text); line-height:1.8; white-space:pre-wrap;"></div>
+      <button type="button" class="modal-close-btn" data-close="policyOverlay" data-i18n="close">Close</button>
+    </div>
+  </div>
+
+  <!-- Payment info modal (replaces plain browser alert) -->
+  <div class="modal-overlay" id="payInfoOverlay">
+    <div class="modal-card" style="text-align:center;">
+      <div class="pay-info-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      </div>
+      <div class="pay-info-months" id="payInfoMonths">—</div>
+      <div class="pay-info-amount" id="payInfoAmount">₹0</div>
+      <div class="pay-info-note" id="payInfoNote"></div>
+      <div style="height:1px; background:var(--paper-line); margin:16px 0;"></div>
+      <div class="pay-info-soon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span data-i18n="payment_soon">Online payment is coming soon</span>
+      </div>
+      <p style="font-size:0.78rem; color:var(--muted); margin:8px 0 16px;" data-i18n="payment_contact_office">For now, please contact the office:</p>
+      <div class="contact-btn-row" style="margin-bottom:0;">
+        <a href="tel:8103026611" class="contact-btn call">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>8103026611</span>
+        </a>
+        <a href="tel:9183516611" class="contact-btn call">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>9183516611</span>
+        </a>
+      </div>
+      <button type="button" class="modal-close-btn" data-close="payInfoOverlay" data-i18n="close">Close</button>
+    </div>
+  </div>
+
+  <!-- Edit My Info modal -->
+  <div class="modal-overlay" id="editInfoOverlay">
+    <div class="modal-card">
+      <div class="modal-card-title">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        <span data-i18n="edit_info_title">Edit My Information</span>
+      </div>
+      <p style="font-size:0.76rem;color:var(--muted);margin:-6px 0 14px;" data-i18n="edit_info_desc">Fill in your correct details here — this will update the office record directly.</p>
+
+      <form id="editInfoForm">
+        <div class="ei-photo-row">
+          <img id="eiPhotoPreview" class="ei-photo-preview" style="display:none;">
+          <div id="eiPhotoPlaceholder" class="ei-photo-placeholder">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.3"/><path d="M5 20c0-3.4 3-6 7-6s7 2.6 7 6"/></svg>
+          </div>
+          <label class="ei-photo-upload-btn">
+            <span data-i18n="change_photo">Change Photo</span>
+            <input type="file" id="eiPhotoFile" accept="image/*" style="display:none;">
+          </label>
+        </div>
+        <input type="hidden" id="eiPhotoData">
+
+        <div class="ei-field"><label data-i18n="students_name">Student's Name</label><input type="text" id="eiName" required></div>
+        <div class="ei-field"><label data-i18n="class_label">Class</label><input type="text" id="eiClass" placeholder="e.g. 5th"></div>
+        <div class="ei-field"><label data-i18n="school_label">School</label><select id="eiSchool"></select></div>
+        <div class="ei-field"><label data-i18n="vehicle_label">Vehicle / Van</label><select id="eiVehicle"></select></div>
+        <div class="ei-field"><label data-i18n="parents_name">Parent's Name</label><input type="text" id="eiParent"></div>
+        <div class="ei-field"><label data-i18n="phone_label">Phone Number</label><input type="tel" id="eiPhone" inputmode="numeric"></div>
+        <div class="ei-field"><label data-i18n="village_label">Village / Area</label><input type="text" id="eiVillage"></div>
+
+        <button type="submit" class="btn-save-info" id="eiSaveBtn" data-i18n="save_changes">Save Changes</button>
+      </form>
+      <div id="eiStatusMsg" style="text-align:center;font-size:0.8rem;margin-top:10px;min-height:18px;"></div>
+      <button type="button" class="modal-close-btn" data-close="editInfoOverlay">Close</button>
+    </div>
+  </div>
+
+  <!-- Bill detail view overlay -->
+  <div id="billViewOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#fff; border-radius:16px; max-width:380px; width:100%; padding:22px; max-height:85vh; overflow-y:auto;">
+      <div id="billViewContent"></div>
+      <button type="button" id="downloadBillPdfBtn" style="width:100%; margin-top:12px; background:linear-gradient(160deg,var(--brass-light),var(--brass-deep)); color:#2A2114; border:none; border-radius:10px; padding:11px; font-weight:700; cursor:pointer;">Download PDF Receipt</button>
+      <button type="button" id="closeBillViewBtn" style="width:100%; margin-top:10px; background:var(--paper); border:1px solid var(--paper-line); border-radius:10px; padding:11px; font-weight:600; cursor:pointer;">Close</button>
+    </div>
+  </div>
+
+  <!-- New Student Registration modal -->
+  <div class="modal-overlay" id="rentVehicleOverlay">
+    <div class="modal-card">
+      <div class="modal-card-title">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><path d="M5 17h14M5 17a2 2 0 0 1-2-2v-2a2 2 0 0 1 .5-1.3L5.4 8.2A2 2 0 0 1 7 7.5h10a2 2 0 0 1 1.6.7l1.9 3.5a2 2 0 0 1 .5 1.3v2a2 2 0 0 1-2 2M5 17a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2M17 17a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2"/><circle cx="7" cy="17" r="1"/><circle cx="17" cy="17" r="1"/></svg>
+        <span>Rent a Vehicle</span>
+      </div>
+      <div id="rentVehicleList" style="max-height:55vh;overflow-y:auto;"></div>
+      <button type="button" class="modal-close-btn" data-close="rentVehicleOverlay">Close</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="bookVehicleOverlay">
+    <div class="modal-card">
+      <div class="modal-card-title">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><path d="M5 17h14M5 17a2 2 0 0 1-2-2v-2a2 2 0 0 1 .5-1.3L5.4 8.2A2 2 0 0 1 7 7.5h10a2 2 0 0 1 1.6.7l1.9 3.5a2 2 0 0 1 .5 1.3v2a2 2 0 0 1-2 2M5 17a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2M17 17a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2"/><circle cx="7" cy="17" r="1"/><circle cx="17" cy="17" r="1"/></svg>
+        <span id="bookVehicleTitle">Book Vehicle</span>
+      </div>
+      <input type="hidden" id="bookVehicleId">
+      <div class="field">
+        <label>Your Name</label>
+        <input type="text" id="bookRenterName">
+      </div>
+      <div class="field">
+        <label>Your Mobile Number</label>
+        <input type="tel" id="bookRenterPhone" maxlength="10" inputmode="numeric">
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:16px;">
+        <div class="field" style="flex:1;margin-bottom:0;">
+          <label>From Date</label>
+          <input type="date" id="bookFromDate">
+        </div>
+        <div class="field" style="flex:1;margin-bottom:0;">
+          <label>To Date</label>
+          <input type="date" id="bookToDate">
+        </div>
+      </div>
+      <div class="field">
+        <label>Destination (optional)</label>
+        <input type="text" id="bookDestination">
+      </div>
+      <div id="bookVehicleStatus" style="text-align:center;font-size:0.82rem;margin-bottom:8px;min-height:18px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button type="button" class="modal-close-btn" data-close="bookVehicleOverlay" style="margin-top:0;">Cancel</button>
+        <button type="button" id="submitVehicleBookingBtn" style="margin-top:0;flex:1;background:var(--ink-dark);color:#fff;border:none;border-radius:10px;padding:11px;font-weight:700;cursor:pointer;">Send Booking Request</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="myFeedbackOverlay">
+    <div class="modal-card">
+      <div class="modal-card-title">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>My Suggestions / Complaints</span>
+      </div>
+      <div id="myFeedbackContent" style="max-height:60vh;overflow-y:auto;"></div>
+      <button type="button" class="modal-close-btn" data-close="myFeedbackOverlay">Close</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="feedbackOverlay">
+    <div class="modal-card">
+      <div class="modal-card-title">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Suggestion / Complaint</span>
+      </div>
+      <p style="font-size:0.8rem;color:var(--muted);margin:-4px 0 12px;">Ye seedhe office ko bhej diya jayega.</p>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button type="button" class="feedback-type-chip active" data-type="Suggestion" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--paper-line);background:var(--ink-dark);color:#fff;font-weight:700;font-size:0.82rem;cursor:pointer;">💡 Suggestion</button>
+        <button type="button" class="feedback-type-chip" data-type="Complaint" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--paper-line);background:#fff;color:var(--text);font-weight:700;font-size:0.82rem;cursor:pointer;">⚠️ Complaint</button>
+      </div>
+      <input type="hidden" id="feedbackType" value="Suggestion">
+      <textarea id="feedbackMessage" rows="4" placeholder="Apna message likhein..." style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--paper-line);border-radius:12px;font-size:0.9rem;font-family:inherit;"></textarea>
+      <div id="feedbackStatus" style="font-size:0.8rem;margin-top:8px;min-height:18px;"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button type="button" class="modal-close-btn" data-close="feedbackOverlay" style="margin-top:0;">Cancel</button>
+        <button type="button" id="submitFeedbackBtn" style="margin-top:0;flex:1;background:var(--ink-dark);color:#fff;border:none;border-radius:10px;padding:11px;font-weight:700;cursor:pointer;">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="installOverlay">
+    <div class="modal-card">
+      <div class="modal-card-title">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Install App</span>
+      </div>
+      <div style="font-size:0.86rem;color:var(--text);line-height:1.7;">
+        Is portal ko apne phone ki Home Screen par ek app ki tarah add karein:<br><br>
+        <b>Android (Chrome):</b> Upar-right corner mein <b>⋮</b> (teen dot) menu par tap karein, phir <b>"Add to Home screen"</b> ya <b>"Install app"</b> choose karein.<br><br>
+        <b>iPhone (Safari):</b> Neeche Share icon <b>⬆</b> par tap karein, phir <b>"Add to Home Screen"</b> choose karein.
+      </div>
+      <button type="button" class="modal-close-btn" data-close="installOverlay">Got it</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="registerOverlay">
+    <div class="modal-card">
+      <div class="modal-card-title">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        <span data-i18n="register_title">New Student Registration</span>
+      </div>
+      <p style="font-size:0.76rem;color:var(--muted);margin:-6px 0 14px;" data-i18n="register_desc">Fill in your child's details below. Our office will review and verify this before your login becomes active.</p>
+
+      <form id="registerForm">
+        <div class="ei-field"><label data-i18n="students_name">Student's Name</label><input type="text" id="regName" required></div>
+        <div class="ei-field"><label data-i18n="class_label">Class</label><input type="text" id="regClass" placeholder="e.g. 5th"></div>
+        <div class="ei-field"><label data-i18n="school_label">School</label><select id="regSchool"></select></div>
+        <div class="ei-field"><label data-i18n="parents_name">Parent's Name</label><input type="text" id="regParent" required></div>
+        <div class="ei-field"><label data-i18n="phone_label">Phone Number</label><input type="tel" id="regPhone" inputmode="numeric" maxlength="10" required></div>
+        <div class="ei-field"><label data-i18n="village_label">Village / Area</label><input type="text" id="regVillage"></div>
+
+        <div id="regStatusMsg" style="text-align:center;font-size:0.8rem;margin:8px 0;min-height:18px;"></div>
+        <button type="submit" class="btn-save-info" id="submitRegisterBtn" data-i18n="submit_registration">Submit Registration</button>
+      </form>
+      <button type="button" class="modal-close-btn" data-close="registerOverlay" data-i18n="close">Close</button>
+    </div>
+  </div>
+
+  <!-- Set / Change PIN modal -->
+  <div class="modal-overlay" id="pinOverlay">
+    <div class="modal-card">
+      <div class="modal-card-title">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brass-deep);"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span id="pinModalTitle" data-i18n="set_my_pin">Set My PIN</span>
+      </div>
+      <p style="font-size:0.76rem;color:var(--muted);margin:-6px 0 14px;" data-i18n="pin_desc">A 4-digit PIN keeps your child's fee details private — once set, both your phone number and PIN will be needed to log in.</p>
+
+      <div id="pinCurrentField" style="display:none;">
+        <label style="font-size:0.74rem;color:var(--muted);display:block;margin-bottom:4px;" data-i18n="current_pin">Current PIN</label>
+        <input type="tel" id="pinCurrentInput" maxlength="4" inputmode="numeric" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--paper-line);border-radius:9px;font-family:'JetBrains Mono',monospace;letter-spacing:2px;margin-bottom:12px;">
+      </div>
+      <label style="font-size:0.74rem;color:var(--muted);display:block;margin-bottom:4px;" data-i18n="new_pin">New 4-digit PIN</label>
+      <input type="tel" id="pinNewInput" maxlength="4" inputmode="numeric" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--paper-line);border-radius:9px;font-family:'JetBrains Mono',monospace;letter-spacing:2px;margin-bottom:12px;">
+      <label style="font-size:0.74rem;color:var(--muted);display:block;margin-bottom:4px;" data-i18n="confirm_pin">Confirm New PIN</label>
+      <input type="tel" id="pinConfirmInput" maxlength="4" inputmode="numeric" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--paper-line);border-radius:9px;font-family:'JetBrains Mono',monospace;letter-spacing:2px;margin-bottom:6px;">
+
+      <div id="pinStatusMsg" style="text-align:center;font-size:0.8rem;margin:8px 0;min-height:18px;"></div>
+      <button type="button" class="btn-save-info" id="savePinBtn" data-i18n="save_pin">Save PIN</button>
+      <button type="button" class="modal-close-btn" id="pinSkipBtn" data-i18n="skip_for_now" style="display:none;">Maybe later</button>
+      <button type="button" class="modal-close-btn" id="pinCloseBtn" data-close="pinOverlay" data-i18n="close">Close</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  DAXON MOBILITY<br>
+  Reg No: UDYAM-MP-32-0014395 · GSTIN: 23BORPR8040F1ZP<br>
+  📍 Barman, Barman College ke samne, Government Hospital Road, Pin 487330, M.P.
+</footer>
+
+<script>
+let LANG = localStorage.getItem('parentPortalLang') || 'en';
+
+const translations = {
+  en: {
+    header_subtitle: 'Parent Fee Portal',
+    login_title: 'Check Your Fee Status',
+    login_desc: 'Enter your registered mobile number — the one we have on file for the van fee.',
+    phone_placeholder: '10 digit number',
+    login_btn: 'Check',
+    login_loading: 'Searching…',
+    login_contact_note: 'Number not matching? Contact the office:',
+    picker_title: "Which child's fee status do you want to see?",
+    go_back: 'Go back',
+    per_month: 'per month',
+    call: 'Call',
+    total_due: 'Total Due',
+    month_detail_section: 'Month-by-Month Detail',
+    fee_status_short: 'Fee Status',
+    th_month: 'Month', th_status: 'Status', th_paid: 'Paid', th_due: 'Due', th_date: 'Date',
+    payment_soon_note: 'Online payment is coming soon — tapping "Pay" will show the office number for now.',
+    quick_access: 'Quick Access',
+    bills: 'Bills', announcements: 'Announcements', policy: 'Policy', edit_my_info: 'Edit My Info',
+    set_my_pin: 'Set My PIN', change_my_pin: 'Change My PIN',
+    pin_placeholder_login: "PIN (only if you've set one)",
+    incorrect_pin: 'Incorrect PIN — please try again.',
+    pin_desc: "A 4-digit PIN keeps your child's fee details private — once set, both your phone number and PIN will be needed to log in.",
+    current_pin: 'Current PIN', new_pin: 'New 4-digit PIN', confirm_pin: 'Confirm New PIN', save_pin: 'Save PIN',
+    pin_mismatch: "PINs don't match — please try again.",
+    pin_must_be_4_digits: 'PIN must be exactly 4 digits.',
+    pin_wrong_current: 'Current PIN is incorrect.',
+    pin_saved: '✓ PIN saved',
+    skip_for_now: 'Maybe later',
+    register_new_student: 'New Student? Register Here',
+    register_title: 'New Student Registration',
+    register_desc: "Fill in your child's details below. Our office will review and verify this before your login becomes active.",
+    submit_registration: 'Submit Registration',
+    register_submitting: 'Submitting…',
+    register_success: "✓ Submitted! We'll review your registration and let you know once your login is active.",
+    register_error: '⚠️ Could not submit — please check your internet and try again.',
+    register_name_required: '⚠️ Please enter the student name.',
+    register_parent_required: "⚠️ Please enter the parent's name.",
+    register_phone_required: '⚠️ Please enter a valid 10-digit phone number.',
+    registration_pending_note: 'Your registration is still under review by our office. Please check back soon, or contact us if it has been a while.',
+    skip_for_now: 'Maybe later',
+    dash_contact_note: 'Having trouble with a payment? Contact the office:',
+    bills_receipts: 'Bills / Receipts',
+    general_announcements: 'General Announcements',
+    van_fee_policy: 'Van Fee Policy',
+    close: 'Close',
+    payment_soon: 'Online payment is coming soon',
+    payment_contact_office: 'For now, please contact the office:',
+    edit_info_title: 'Edit My Information',
+    edit_info_desc: 'Fill in your correct details here — this will update the office record directly.',
+    change_photo: 'Change Photo',
+    students_name: "Student's Name", class_label: 'Class', school_label: 'School',
+    vehicle_label: 'Vehicle / Van', parents_name: "Parent's Name", phone_label: 'Phone Number', village_label: 'Village / Area',
+    save_changes: 'Save Changes',
+    view: 'View', download: 'Download',
+    status_paid: 'Paid', status_due: 'Due', status_partial: 'Half Paid', status_upcoming: 'Not Yet Due',
+    pay_btn: 'Pay', pay_advance_btn: 'Pay in Advance',
+    no_student_found: 'No student found with this number. Please contact the office.',
+    no_announcements: 'No new announcements right now.',
+    no_bills: 'No bills have been generated yet.',
+    no_policy: 'No policy has been set yet.',
+    photo_size_error: '⚠️ Photo must be smaller than 5MB',
+    photo_load_error: '⚠️ Could not load the photo, please try again',
+    name_required: '⚠️ Name is required',
+    save_error: '⚠️ Could not save — please check your internet and try again',
+    saving: 'Saving…',
+    saved_success: '✓ Information updated successfully',
+    invalid_phone: 'Please enter a valid 10-digit mobile number.',
+    whatsapp_msg: (name) => `Hello, I would like to talk about the van fee for ${name}.`,
+    pay_note_multi: 'Total fee for all these pending months (includes any earlier dues)',
+  },
+  hi: {
+    header_subtitle: 'अभिभावक फीस पोर्टल',
+    login_title: 'अपना फीस स्टेटस देखें',
+    login_desc: 'अपना पंजीकृत मोबाइल नंबर डालें — जो हमारे पास वैन फीस के रिकॉर्ड में दर्ज है।',
+    phone_placeholder: '10 अंकों का नंबर',
+    login_btn: 'देखें',
+    login_loading: 'ढूंढ रहे हैं…',
+    login_contact_note: 'नंबर मैच नहीं हो रहा? ऑफिस से संपर्क करें:',
+    picker_title: 'किस बच्चे का फीस स्टेटस देखना है?',
+    go_back: 'वापस जाएं',
+    per_month: 'प्रति माह',
+    call: 'कॉल करें',
+    total_due: 'कुल बकाया',
+    month_detail_section: 'महीने के हिसाब से विवरण',
+    fee_status_short: 'फीस स्टेटस',
+    th_month: 'महीना', th_status: 'स्थिति', th_paid: 'जमा', th_due: 'बकाया', th_date: 'तारीख',
+    payment_soon_note: 'ऑनलाइन पेमेंट जल्द ही शुरू होगा — अभी "Pay" दबाने पर ऑफिस का नंबर दिखेगा।',
+    quick_access: 'त्वरित सुविधाएं',
+    bills: 'बिल', announcements: 'सूचनाएं', policy: 'नीति', edit_my_info: 'मेरी जानकारी बदलें',
+    set_my_pin: 'PIN सेट करें', change_my_pin: 'PIN बदलें',
+    pin_placeholder_login: 'PIN (अगर सेट किया है तो)',
+    incorrect_pin: 'गलत PIN — कृपया दोबारा कोशिश करें।',
+    pin_desc: 'एक 4-अंकों का PIN आपके बच्चे की फीस जानकारी को निजी रखता है — एक बार सेट करने के बाद, लॉगिन के लिए फोन नंबर और PIN दोनों चाहिए होंगे।',
+    current_pin: 'मौजूदा PIN', new_pin: 'नया 4-अंकों का PIN', confirm_pin: 'नया PIN दोबारा डालें', save_pin: 'PIN सेव करें',
+    pin_mismatch: 'PIN मैच नहीं हो रहे — दोबारा कोशिश करें।',
+    pin_must_be_4_digits: 'PIN बिल्कुल 4 अंकों का होना चाहिए।',
+    pin_wrong_current: 'मौजूदा PIN गलत है।',
+    pin_saved: '✓ PIN सेव हो गया',
+    skip_for_now: 'बाद में करूंगा',
+    register_new_student: 'नया छात्र? यहां रजिस्टर करें',
+    register_title: 'नया छात्र पंजीकरण',
+    register_desc: 'नीचे अपने बच्चे की जानकारी भरें। लॉगिन शुरू होने से पहले हमारा ऑफिस इसे जांचकर वेरिफाई करेगा।',
+    submit_registration: 'पंजीकरण जमा करें',
+    register_submitting: 'जमा हो रहा है…',
+    register_success: '✓ जमा हो गया! हम आपका पंजीकरण जांचेंगे और लॉगिन शुरू होते ही बता देंगे।',
+    register_error: '⚠️ जमा नहीं हो पाया — इंटरनेट जांचकर दोबारा कोशिश करें।',
+    register_name_required: '⚠️ कृपया छात्र का नाम डालें।',
+    register_parent_required: '⚠️ कृपया अभिभावक का नाम डालें।',
+    register_phone_required: '⚠️ कृपया सही 10 अंकों का फोन नंबर डालें।',
+    registration_pending_note: 'आपका पंजीकरण अभी हमारे ऑफिस द्वारा जांचा जा रहा है। कृपया थोड़ी देर बाद देखें, या ज्यादा समय हो गया हो तो संपर्क करें।',
+    skip_for_now: 'बाद में करूंगा',
+    dash_contact_note: 'पेमेंट में कोई दिक्कत हो तो ऑफिस से संपर्क करें:',
+    bills_receipts: 'बिल / रसीदें',
+    general_announcements: 'सामान्य सूचनाएं',
+    van_fee_policy: 'वैन फीस नीति',
+    close: 'बंद करें',
+    payment_soon: 'ऑनलाइन पेमेंट जल्द ही शुरू होगा',
+    payment_contact_office: 'अभी के लिए, कृपया ऑफिस से संपर्क करें:',
+    edit_info_title: 'मेरी जानकारी बदलें',
+    edit_info_desc: 'यहां अपनी सही जानकारी भरें — यह सीधे ऑफिस के रिकॉर्ड में अपडेट हो जाएगी।',
+    change_photo: 'फोटो बदलें',
+    students_name: 'छात्र का नाम', class_label: 'कक्षा', school_label: 'स्कूल',
+    vehicle_label: 'वाहन / वैन', parents_name: 'अभिभावक का नाम', phone_label: 'फोन नंबर', village_label: 'गांव / क्षेत्र',
+    save_changes: 'बदलाव सेव करें',
+    view: 'देखें', download: 'डाउनलोड',
+    status_paid: 'जमा', status_due: 'बकाया', status_partial: 'आधा जमा', status_upcoming: 'अभी देय नहीं',
+    pay_btn: 'भुगतान करें', pay_advance_btn: 'अग्रिम भुगतान करें',
+    no_student_found: 'इस नंबर से कोई छात्र नहीं मिला। कृपया ऑफिस से संपर्क करें।',
+    no_announcements: 'अभी कोई नई सूचना नहीं है।',
+    no_bills: 'अभी तक कोई बिल नहीं बना है।',
+    no_policy: 'अभी तक कोई नीति सेट नहीं की गई है।',
+    photo_size_error: '⚠️ फोटो 5MB से छोटी होनी चाहिए',
+    photo_load_error: '⚠️ फोटो लोड नहीं हो पाई, दोबारा कोशिश करें',
+    name_required: '⚠️ नाम ज़रूरी है',
+    save_error: '⚠️ सेव नहीं हो पाया — इंटरनेट जांचकर दोबारा कोशिश करें',
+    saving: 'सेव हो रहा है…',
+    saved_success: '✓ जानकारी अपडेट हो गई',
+    invalid_phone: 'कृपया 10 अंकों का सही मोबाइल नंबर डालें।',
+    whatsapp_msg: (name) => `नमस्ते, मैं ${name} की वैन फीस के बारे में बात करना चाहता हूं।`,
+    pay_note_multi: 'इन सभी बकाया महीनों की कुल फीस (पुरानी बकाया फीस भी शामिल है)',
+  }
+};
+
+function t(key){
+  const val = translations[LANG][key];
+  return val !== undefined ? val : translations.en[key];
+}
+
+function applyStaticTranslations(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if(typeof val === 'string') el.textContent = val;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-placeholder');
+    el.placeholder = t(key);
+  });
+  document.documentElement.lang = LANG;
+}
+
+document.getElementById('langToggleBtn').addEventListener('click', ()=>{
+  LANG = (LANG === 'en') ? 'hi' : 'en';
+  localStorage.setItem('parentPortalLang', LANG);
+  applyStaticTranslations();
+  // Re-render whichever dynamic screen is currently showing, so JS-generated
+  // text (table rows, lists, statuses) picks up the new language too.
+  if(document.getElementById('dashScreen').style.display === 'block' && currentStudent){
+    showDashboard(currentStudent);
+  }
+  if(document.getElementById('pickerScreen').style.display === 'block' && matchedStudents.length){
+    showPicker(matchedStudents);
+  }
+});
+applyStaticTranslations();
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDzABowWH-8LZrRhrIssvDhL4mfVT_DXOk",
+    authDomain: "van-register.firebaseapp.com",
+    databaseURL: "https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "van-register",
+    storageBucket: "van-register.firebasestorage.app",
+    messagingSenderId: "89738000508",
+    appId: "1:89738000508:web:1ef2cbd3093dcb273131f9"
+  };
+  const fbApp = initializeApp(firebaseConfig);
+  // App Check — makes sure only our real, deployed apps can talk to
+  // Firebase (blocks scripts/bots hitting the database directly).
+  const appCheck = initializeAppCheck(fbApp, {
+    provider: new ReCaptchaV3Provider('6LctvKgtAAAAACjX8ZkGDa0fazUdW1oTUNL8WwlE'),
+    isTokenAutoRefreshEnabled: true
+  });
+  const fbAuth = getAuth(fbApp);
+
+  // Every embedded app on this site signs in anonymously the moment it loads.
+  // This doesn't identify who the person is — it just proves the request came
+  // from this app rather than a stranger who found the database URL, which is
+  // what the Realtime Database security rules now require for any read/write.
+  window.__firebaseAuthReady = new Promise((resolve, reject)=>{
+    let settled = false;
+    onAuthStateChanged(fbAuth, (user)=>{ if(user && !settled){ settled = true; resolve(user); } });
+    signInAnonymously(fbAuth).catch(e=>{
+      console.error('Firebase anonymous sign-in failed:', e);
+      if(!settled){ settled = true; reject(e); }
+    });
+    // Safety net: never leave the app stuck on "Searching…" forever if the
+    // network is slow or blocked — fail clearly after 15 seconds instead.
+    setTimeout(()=>{
+      if(!settled){ settled = true; reject(new Error('Firebase auth timed out')); }
+    }, 30000);
+  });
+
+  window.getFirebaseAuthToken = async function(){
+    const user = await window.__firebaseAuthReady;
+    return await user.getIdToken();
+  };
+
+  window.authedFetch = async function(url, options){
+    const token = await window.getFirebaseAuthToken();
+    const sep = url.includes('?') ? '&' : '?';
+    return fetch(`${url}${sep}auth=${token}`, options);
+  };
+</script>
+<script>
+
+// ---------- Slow-network safety: wait for the Firebase auth helper ----------
+// On a slow connection, the rest of this page can start running before the
+// tiny Firebase auth module (loaded via <script type="module">, which is
+// asynchronous) has finished setting up window.authedFetch — causing
+// "authedFetch is not defined". This waits (up to 15s) instead of racing.
+async function waitForAuthedFetch(timeoutMs){
+  timeoutMs = timeoutMs || 15000;
+  const start = Date.now();
+  while(typeof window.authedFetch !== 'function'){
+    if(Date.now() - start > timeoutMs){
+      throw new Error('Firebase script did not finish loading (slow/no internet)');
+    }
+    await new Promise(r => setTimeout(r, 100));
+  }
+  return window.authedFetch;
+}
+
+const FIREBASE_DB_URL = 'https://van-register-default-rtdb.asia-southeast1.firebasedatabase.app';
+const MONTHS = ["Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr"];
+const MONTH_KEYS = ["07","08","09","10","11","12","01","02","03","04"];
+
+let state = { students: [], schools: [], vehicles: [], fees: {}, invoices: [], announcements: [], lateFeeWaivers: {}, pendingRegistrations: [], drivers: [], delayUpdates: [], liveLocations: {}, routes: [], parentFeedback: [] };
+let currentYear = getAcademicYearStart();
+let matchedStudents = [];
+
+function getAcademicYearStart(date){
+  date = date || new Date();
+  const m = date.getMonth() + 1;
+  const y = date.getFullYear();
+  return (m <= 4) ? (y - 1) : y;
+}
+function yearForMonth(mk){ return (parseInt(mk,10) >= 7) ? currentYear : (currentYear + 1); }
+function cleanPhone(phone){
+  if(!phone) return '';
+  let digits = String(phone).replace(/[^0-9]/g, '');
+  if(digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
+  return digits;
+}
+function feeKey(studentId, mk){ return studentId + '-' + yearForMonth(mk) + '-' + mk; }
+function paidAmountFor(studentId, mk){
+  const rec = state.fees[feeKey(studentId, mk)];
+  return rec ? Number(rec.amountPaid||0) : 0;
+}
+function paidDateFor(studentId, mk){
+  const rec = state.fees[feeKey(studentId, mk)];
+  return rec && rec.lastDate ? rec.lastDate : '';
+}
+function paidRecordedAtFor(studentId, mk){
+  const rec = state.fees[feeKey(studentId, mk)];
+  return rec && rec.recordedAt ? rec.recordedAt : '';
+}
+function formatDate(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return d.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+}
+// Shows day-of-week + date, and the time too when we have a precise
+// recorded timestamp (older payments only have a plain date, no time).
+function formatDateDayTime(dateOnly, recordedAt){
+  const source = recordedAt || dateOnly;
+  if(!source) return { line1:'—', line2:'' };
+  const d = new Date(source);
+  if(isNaN(d)) return { line1: dateOnly, line2:'' };
+  const line1 = d.toLocaleDateString('en-IN', { weekday:'short', day:'2-digit', month:'short', year:'numeric' });
+  const line2 = recordedAt ? d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }) : '';
+  return { line1, line2 };
+}
+const LATE_FEE_AMOUNT = 50;
+function isPastLateFeeGrace(mk){
+  const feeYear = yearForMonth(mk);
+  const feeMonthNum = parseInt(mk, 10);
+  let followMonth = feeMonthNum + 1;
+  let followYear = feeYear;
+  if(followMonth > 12){ followMonth = 1; followYear += 1; }
+  const graceEnd = new Date(followYear, followMonth - 1, 10, 23, 59, 59);
+  return new Date() > graceEnd;
+}
+function isLateFeeWaived(studentId, mk){
+  return !!(state.lateFeeWaivers && state.lateFeeWaivers[feeKey(studentId, mk)]);
+}
+function lateFeeFor(student, mk){
+  if(Number(student.fee||0) <= 0) return 0;
+  const paidAmt = paidAmountFor(student.id, mk);
+  if(paidAmt >= Number(student.fee||0)) return 0;
+  if(!isPastLateFeeGrace(mk)) return 0;
+  if(isLateFeeWaived(student.id, mk)) return 0;
+  return LATE_FEE_AMOUNT;
+}
+function dueAmountForMonth(student, mk){
+  const base = Math.max(0, Number(student.fee||0) - paidAmountFor(student.id, mk));
+  return base > 0 ? base + lateFeeFor(student, mk) : base;
+}
+function isMonthOverdue(mk){
+  const feeYear = yearForMonth(mk);
+  const feeMonth = parseInt(mk, 10);
+  const now = new Date();
+  const nowYear = now.getFullYear();
+  const nowMonth = now.getMonth() + 1;
+  if(nowYear > feeYear) return true;
+  if(nowYear === feeYear && nowMonth > feeMonth) return true;
+  return false;
+}
+function feeStatus(student, mk){
+  const fee = Number(student.fee||0);
+  const paidAmt = paidAmountFor(student.id, mk);
+  if(fee <= 0) return paidAmt > 0 ? 'paid' : (isMonthOverdue(mk) ? 'due' : 'upcoming');
+  if(paidAmt >= fee) return 'paid';
+  if(paidAmt > 0) return 'partial';
+  return isMonthOverdue(mk) ? 'due' : 'upcoming';
+}
+function schoolName(id){
+  const sc = state.schools.find(s=>s.id===id);
+  return sc ? sc.name : '';
+}
+function vehicleName(id){
+  const v = state.vehicles.find(v=>v.name===id || v.id===id);
+  return v ? v.name : '';
+}
+
+let fullRawState = null; // keeps EVERY field from Firebase intact — saves stay surgical, never wipe unrelated admin data
+let currentBillForPdf = null;
+
+async function loadData(){
+  try{
+    const res = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/data.json`);
+    const raw = await res.json();
+    if(raw && raw.value){
+      const parsed = JSON.parse(raw.value);
+      fullRawState = parsed;
+      state.students = parsed.students || [];
+      state.schools = parsed.schools || [];
+      state.vehicles = parsed.vehicles || [];
+      state.fees = parsed.fees || {};
+      state.invoices = parsed.invoices || [];
+      state.announcements = parsed.announcements || [];
+      state.policy = parsed.policy || null;
+      state.lateFeeWaivers = parsed.lateFeeWaivers || {};
+      state.pendingRegistrations = parsed.pendingRegistrations || [];
+      state.parentFeedback = parsed.parentFeedback || [];
+    }
+  }catch(e){
+    console.error('Load failed', e);
+    throw e;
+  }
+  // Read-only: pulls the current driver list so we can show which driver is
+  // assigned to the student's van right now — always live, since this is
+  // fetched fresh on every login rather than cached, so a driver change made
+  // by the admin shows up here immediately without any extra syncing.
+  try{
+    const res2 = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/driverData.json`);
+    const raw2 = await res2.json();
+    if(raw2 && raw2.value){
+      const parsed2 = JSON.parse(raw2.value);
+      state.drivers = parsed2.drivers || [];
+      state.delayUpdates = parsed2.delayUpdates || [];
+      state.routes = parsed2.routes || [];
+    }
+  }catch(e){
+    console.log('Driver info load failed (non-fatal):', e);
+    state.drivers = state.drivers || [];
+  }
+  // Read-only: same small liveLocations key the office and driver already
+  // use — only ever populated while the driver has sharing on (6 AM–6 PM).
+  try{
+    const res3 = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/liveLocations.json`);
+    const raw3 = await res3.json();
+    state.liveLocations = (raw3 && raw3.value) ? (JSON.parse(raw3.value) || {}) : {};
+  }catch(e){
+    console.log('Live location load failed (non-fatal):', e);
+    state.liveLocations = state.liveLocations || {};
+  }
+}
+
+// Finds the driver currently assigned to a given vehicle (matched flexibly
+// by id or name, same as vehicleName() does) — so if the admin reassigns a
+// vehicle to a different driver, parents see the new driver right away.
+function driverForVehicle(vehicleIdOrName){
+  if(!vehicleIdOrName) return null;
+  const v = state.vehicles.find(v=>v.name===vehicleIdOrName || v.id===vehicleIdOrName);
+  if(!v) return null;
+  return (state.drivers || []).find(d => d.vehicleId === v.id || d.vehicleId === v.name) || null;
+}
+
+// All routes fixed for a given vehicle (a vehicle can have more than one —
+// e.g. a morning route and an afternoon route).
+function routesForVehicle(vehicleIdOrName){
+  if(!vehicleIdOrName) return [];
+  const v = state.vehicles.find(v=>v.name===vehicleIdOrName || v.id===vehicleIdOrName);
+  const matchKeys = v ? [v.id, v.name] : [vehicleIdOrName];
+  return (state.routes || []).filter(r => matchKeys.includes(r.vehicleId));
+}
+
+function formatTime12h(t){
+  const parts = String(t).split(':');
+  if(parts.length < 2) return t;
+  let h = Number(parts[0]);
+  const m = parts[1];
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12; if(h === 0) h = 12;
+  return `${h}:${m} ${ampm}`;
+}
+
+// How long ago a delay update was posted, in friendly words.
+function timeAgoParent(isoString){
+  const diffMin = Math.max(0, Math.floor((Date.now() - new Date(isoString).getTime()) / 60000));
+  if(diffMin < 1) return 'abhi';
+  if(diffMin < 60) return diffMin + ' min pehle';
+  const diffHr = Math.floor(diffMin / 60);
+  return diffHr + ' ghante pehle';
+}
+
+
+// Merges an edited student object into the FULL original data (not just our
+// local trimmed-down copy) and writes it back — so nothing else the admin app
+// stores (invoices, NOCs, fee matrix, etc.) ever gets lost in the process.
+
+// ---------- Data-loss safety guard ----------
+// Refuses to save if the students list has suddenly become empty when the
+// data we loaded earlier had real students in it — defense in depth on top
+// of the fullRawState null-check, matching the guard used in the Business
+// Suite admin apps after the 2026-08-13 data-loss incident.
+async function isDangerousEmptyStudentOverwrite(payload){
+  try{
+    const newCount = Array.isArray(payload.students) ? payload.students.length : 0;
+    if(newCount > 0) return false;
+    const fn = await waitForAuthedFetch(5000);
+    const res = await fn(`${FIREBASE_DB_URL}/data.json`);
+    if(res && res.ok){
+      const data = await res.json();
+      if(data && data.value){
+        const prev = JSON.parse(data.value);
+        const prevCount = Array.isArray(prev.students) ? prev.students.length : 0;
+        return prevCount >= 3;
+      }
+    }
+    return false;
+  }catch(e){ return false; }
+}
+
+// ---------- Offline save queue (same pattern used across the whole suite) ----------
+const PENDING_SAVE_PREFIX = 'pendingSave_';
+function queuePendingSave(key, value){
+  try{ localStorage.setItem(PENDING_SAVE_PREFIX + key, value); }catch(e){}
+}
+function clearPendingSave(key){
+  try{ localStorage.removeItem(PENDING_SAVE_PREFIX + key); }catch(e){}
+}
+function hasPendingSave(key){
+  try{ return !!localStorage.getItem(PENDING_SAVE_PREFIX + key); }catch(e){ return false; }
+}
+async function retryPendingSaves(){
+  let pending;
+  try{ pending = localStorage.getItem(PENDING_SAVE_PREFIX + 'data'); }catch(e){ return; }
+  if(!pending) return;
+  try{
+    const res = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/data.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value: pending })
+    });
+    if(res.ok){
+      clearPendingSave('data');
+      const warnEl = document.getElementById('syncWarning');
+      if(warnEl) warnEl.style.display = 'none';
+    }
+  }catch(e){ /* still offline — will try again on the next timer tick */ }
+}
+setInterval(retryPendingSaves, 30000);
+window.addEventListener('online', retryPendingSaves);
+
+async function saveParentData(){
+  if(await isDangerousEmptyStudentOverwrite(fullRawState)){
+    console.error('BLOCKED: refusing to save empty students list over existing data');
+    return { ok:false, error: new Error('Save blocked: students list looked unexpectedly empty') };
+  }
+  const value = JSON.stringify(fullRawState);
+  try{
+    const res = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/data.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value })
+    });
+    if(!res.ok) throw new Error('Save failed');
+    clearPendingSave('data');
+    const warnEl = document.getElementById('syncWarning');
+    if(warnEl) warnEl.style.display = 'none';
+    return { ok:true };
+  }catch(e){
+    queuePendingSave('data', value);
+    const warnEl = document.getElementById('syncWarning');
+    if(warnEl) warnEl.style.display = 'flex';
+    return { ok:true, offline:true };
+  }
+}
+
+function todayDateKey(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function renderLeaveStatus(student){
+  const today = todayDateKey();
+  const marked = (fullRawState && fullRawState.studentLeaves || []).find(l => l.studentId === student.id && l.date === today);
+  const label = document.getElementById('leaveStatusLabel');
+  const btn = document.getElementById('toggleLeaveBtn');
+  if(marked){
+    label.textContent = 'Aaj chhutti — driver ko bata diya gaya hai';
+    label.style.color = '#96650F';
+    btn.textContent = 'Cancel';
+    btn.style.background = 'var(--paper)';
+    btn.style.color = 'var(--muted)';
+    btn.style.border = '1px solid var(--paper-line)';
+  } else {
+    label.textContent = 'Aaj school jaa raha hai';
+    label.style.color = 'var(--ink-dark)';
+    btn.textContent = 'Mark Absent';
+    btn.style.background = '#FCEFD9';
+    btn.style.color = '#96650F';
+    btn.style.border = '1px solid #E8CE7A';
+  }
+}
+
+document.getElementById('toggleLeaveBtn').addEventListener('click', async ()=>{
+  if(!currentStudent || !fullRawState) return;
+  const btn = document.getElementById('toggleLeaveBtn');
+  const today = todayDateKey();
+  fullRawState.studentLeaves = fullRawState.studentLeaves || [];
+  const idx = fullRawState.studentLeaves.findIndex(l => l.studentId === currentStudent.id && l.date === today);
+  btn.disabled = true;
+  if(idx > -1){
+    fullRawState.studentLeaves.splice(idx, 1);
+  } else {
+    // Drop anything older than 3 days so this list doesn't grow forever.
+    const cutoff = Date.now() - 3*24*60*60*1000;
+    fullRawState.studentLeaves = fullRawState.studentLeaves.filter(l => new Date(l.createdAt).getTime() > cutoff);
+    fullRawState.studentLeaves.push({
+      id: 'leave_'+Date.now(),
+      studentId: currentStudent.id,
+      studentName: currentStudent.name,
+      vehicleId: currentStudent.vehicleId || '',
+      date: today,
+      createdAt: new Date().toISOString()
+    });
+  }
+  const result = await saveParentData();
+  btn.disabled = false;
+  if(result.ok){
+    renderLeaveStatus(currentStudent);
+  } else {
+    alert('Save nahi ho paaya — internet check karein');
+  }
+});
+
+// ---------- Rent a Vehicle (Car Rental — same Firebase project, "carRental" key) ----------
+let selectedVehicleForBooking = null;
+
+document.getElementById('openRentVehicleBtn').addEventListener('click', async ()=>{
+  const listEl = document.getElementById('rentVehicleList');
+  listEl.innerHTML = '<div class="empty-note">Loading…</div>';
+  document.getElementById('rentVehicleOverlay').style.display = 'flex';
+  try{
+    const res = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/carRental/vehicles.json`);
+    const raw = await res.json();
+    const vehicles = [];
+    if(raw){
+      Object.keys(raw).forEach(ownerPhone => {
+        const v = raw[ownerPhone];
+        if(v && v.status === 'approved' && v.available){
+          vehicles.push({ ...v, id: ownerPhone });
+        }
+      });
+    }
+    if(vehicles.length === 0){
+      listEl.innerHTML = '<div class="empty-note">Abhi koi vehicle available nahi hai. Baad mein check karein.</div>';
+      return;
+    }
+    const icons = { Hatchback:'🚗', Sedan:'🚙', SUV:'🚜', Van:'🚐', Pickup:'🛻' };
+    listEl.innerHTML = vehicles.map(v => `
+      <div style="border:1px solid var(--paper-line);border-radius:12px;padding:12px 14px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-weight:700;color:var(--ink-dark);">${icons[v.type]||'🚗'} ${v.model}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--brass-deep);">₹${v.rentPerDay}<span style="font-size:0.65rem;color:var(--muted);">/day</span></span>
+        </div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px;">${v.seats} seats · ${v.plate} · 📍 ${v.location}</div>
+        <button type="button" onclick="openBookVehicleModal('${v.id}')" style="width:100%;background:var(--ink-dark);color:#fff;border:none;border-radius:10px;padding:10px;font-weight:700;font-size:0.82rem;cursor:pointer;">Book Now</button>
+      </div>
+    `).join('');
+    window.__rentVehicles = vehicles;
+  }catch(e){
+    listEl.innerHTML = '<div class="empty-note">⚠️ Load nahi ho paaya — internet check karein.</div>';
+  }
+});
+
+function openBookVehicleModal(vehicleId){
+  const v = (window.__rentVehicles || []).find(v => v.id === vehicleId);
+  if(!v) return;
+  selectedVehicleForBooking = v;
+  document.getElementById('bookVehicleTitle').textContent = `Book — ${v.model}`;
+  document.getElementById('bookVehicleId').value = v.id;
+  document.getElementById('bookRenterName').value = currentStudent ? (currentStudent.parent || '') : '';
+  document.getElementById('bookRenterPhone').value = currentStudent ? (currentStudent.phone || '') : '';
+  document.getElementById('bookFromDate').value = '';
+  document.getElementById('bookToDate').value = '';
+  document.getElementById('bookDestination').value = '';
+  document.getElementById('bookVehicleStatus').textContent = '';
+  document.getElementById('rentVehicleOverlay').style.display = 'none';
+  document.getElementById('bookVehicleOverlay').style.display = 'flex';
+}
+
+document.getElementById('submitVehicleBookingBtn').addEventListener('click', async ()=>{
+  const statusEl = document.getElementById('bookVehicleStatus');
+  const name = document.getElementById('bookRenterName').value.trim();
+  const phone = document.getElementById('bookRenterPhone').value.trim();
+  const from = document.getElementById('bookFromDate').value;
+  const to = document.getElementById('bookToDate').value;
+  const destination = document.getElementById('bookDestination').value.trim();
+
+  if(!name || !phone || !from || !to){
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = 'Sabhi zaroori fields bharein.';
+    return;
+  }
+  if(!/^\d{10}$/.test(phone)){
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = 'Mobile number 10 digit ka hona chahiye.';
+    return;
+  }
+  if(to < from){
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = '"To" date, "From" date ke baad ki honi chahiye.';
+    return;
+  }
+
+  const v = selectedVehicleForBooking;
+  const booking = {
+    vehicleId: v.id,
+    vehicleModel: v.model,
+    ownerPhone: v.id,
+    renterName: name, renterPhone: phone,
+    fromDate: from, toDate: to, destination,
+    status: 'pending', createdAt: Date.now()
+  };
+
+  const btn = document.getElementById('submitVehicleBookingBtn');
+  btn.disabled = true;
+  statusEl.style.color = 'var(--muted)';
+  statusEl.textContent = 'Sending…';
+  try{
+    const res = await (await waitForAuthedFetch())(`${FIREBASE_DB_URL}/carRental/bookings.json`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(booking)
+    });
+    if(!res.ok) throw new Error('Booking failed');
+    statusEl.style.color = 'var(--paid)';
+    statusEl.textContent = '✓ Booking request bhej diya gaya! Owner call karke confirm karenge.';
+    setTimeout(()=>{ document.getElementById('bookVehicleOverlay').style.display = 'none'; }, 1600);
+  }catch(e){
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = '⚠️ Bhej nahi paaya — internet check karke dobara koshish karein.';
+  }
+  btn.disabled = false;
+});
+
+document.getElementById('openMyFeedbackBtn').addEventListener('click', ()=>{
+  if(!currentStudent) return;
+  const myList = (state.parentFeedback || [])
+    .filter(f => f.studentId === currentStudent.id)
+    .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const container = document.getElementById('myFeedbackContent');
+  if(myList.length === 0){
+    container.innerHTML = '<div class="empty-note">Abhi tak koi suggestion/complaint nahi hai.</div>';
+  } else {
+    container.innerHTML = myList.map(f => {
+      const typeColor = f.type === 'Complaint' ? 'var(--due)' : 'var(--paid)';
+      return `
+      <div style="border:1px solid var(--paper-line);border-radius:12px;padding:12px 14px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-weight:700;color:${typeColor};font-size:0.8rem;">${f.type === 'Complaint' ? '⚠️' : '💡'} ${f.type}</span>
+          <span style="font-size:0.7rem;color:var(--muted);">${new Date(f.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })}</span>
+        </div>
+        <div style="font-size:0.84rem;color:var(--text);line-height:1.6;margin-bottom:8px;">${f.message}</div>
+        ${f.reply ? `
+          <div style="background:var(--paper);border-left:3px solid var(--paid);border-radius:8px;padding:8px 12px;">
+            <div style="font-size:0.7rem;font-weight:700;color:var(--paid);margin-bottom:2px;">✓ Office ka Jawab</div>
+            <div style="font-size:0.82rem;color:var(--text);">${f.reply}</div>
+          </div>
+        ` : `<div style="font-size:0.76rem;color:var(--muted);">⏳ Office ka jawab abhi tak nahi aaya</div>`}
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('myFeedbackOverlay').style.display = 'flex';
+});
+
+document.getElementById('openFeedbackBtn').addEventListener('click', ()=>{
+  document.getElementById('feedbackType').value = 'Suggestion';
+  document.querySelectorAll('.feedback-type-chip').forEach(c=>{
+    const active = c.dataset.type === 'Suggestion';
+    c.classList.toggle('active', active);
+    c.style.background = active ? 'var(--ink-dark)' : '#fff';
+    c.style.color = active ? '#fff' : 'var(--text)';
+  });
+  document.getElementById('feedbackMessage').value = '';
+  document.getElementById('feedbackStatus').textContent = '';
+  document.getElementById('feedbackOverlay').style.display = 'flex';
+});
+
+document.querySelectorAll('.feedback-type-chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    document.getElementById('feedbackType').value = chip.dataset.type;
+    document.querySelectorAll('.feedback-type-chip').forEach(c=>{
+      const active = c === chip;
+      c.classList.toggle('active', active);
+      c.style.background = active ? 'var(--ink-dark)' : '#fff';
+      c.style.color = active ? '#fff' : 'var(--text)';
+    });
+  });
+});
+
+document.getElementById('submitFeedbackBtn').addEventListener('click', async ()=>{
+  if(!currentStudent || !fullRawState) return;
+  const statusEl = document.getElementById('feedbackStatus');
+  const btn = document.getElementById('submitFeedbackBtn');
+  const type = document.getElementById('feedbackType').value;
+  const message = document.getElementById('feedbackMessage').value.trim();
+  if(!message){
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = 'Kripya message likhein.';
+    return;
+  }
+  fullRawState.parentFeedback = fullRawState.parentFeedback || [];
+  // Drop anything older than 60 days so this list doesn't grow forever.
+  const cutoff = Date.now() - 60*24*60*60*1000;
+  fullRawState.parentFeedback = fullRawState.parentFeedback.filter(f => new Date(f.createdAt).getTime() > cutoff);
+  fullRawState.parentFeedback.push({
+    id: 'feedback_'+Date.now(),
+    studentId: currentStudent.id,
+    studentName: currentStudent.name,
+    parentName: currentStudent.parent || '',
+    phone: currentStudent.phone || '',
+    type,
+    message,
+    createdAt: new Date().toISOString()
+  });
+  btn.disabled = true;
+  statusEl.style.color = 'var(--muted)';
+  statusEl.textContent = 'Sending…';
+  const result = await saveParentData();
+  btn.disabled = false;
+  if(result.ok){
+    statusEl.style.color = 'var(--paid)';
+    statusEl.textContent = '✓ Bhej diya gaya';
+    setTimeout(()=>{ document.getElementById('feedbackOverlay').style.display = 'none'; }, 1200);
+  } else {
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = '⚠️ Bhej nahi paaya — internet check karein';
+  }
+});
+
+async function saveStudentEdit(updatedStudent){
+  if(!fullRawState || !Array.isArray(fullRawState.students)) return false;
+  const idx = fullRawState.students.findIndex(s => s.id === updatedStudent.id);
+  if(idx === -1) return false;
+  fullRawState.students[idx] = { ...fullRawState.students[idx], ...updatedStudent };
+  const result = await saveParentData();
+  if(!result.ok){
+    console.error('Save failed', result.error);
+    return false;
+  }
+  state.students = fullRawState.students;
+  return true;
+}
+
+document.getElementById('policyAcceptCheckbox').addEventListener('change', (e)=>{
+  const btn = document.getElementById('policyAcceptContinueBtn');
+  btn.disabled = !e.target.checked;
+  btn.style.opacity = e.target.checked ? '1' : '0.5';
+});
+
+document.getElementById('policyAcceptContinueBtn').addEventListener('click', async ()=>{
+  if(!currentStudent) return;
+  const btn = document.getElementById('policyAcceptContinueBtn');
+  const statusEl = document.getElementById('policyAcceptStatus');
+  btn.disabled = true;
+  statusEl.style.color = 'var(--muted)';
+  statusEl.textContent = 'Saving…';
+  const policyUpdatedAt = (state.policy && state.policy.updatedAt) || '';
+  const ok = await saveStudentEdit({ id: currentStudent.id, policyAcceptedAt: policyUpdatedAt });
+  if(ok){
+    currentStudent = { ...currentStudent, policyAcceptedAt: policyUpdatedAt };
+    document.getElementById('policyAcceptScreen').style.display = 'none';
+    renderDashboardUI(currentStudent);
+  } else {
+    btn.disabled = false;
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = '⚠️ Save nahi ho paaya — internet check karke dobara try karein.';
+  }
+});
+
+async function submitRegistration(registration){
+  if(!fullRawState) return false;
+  if(!Array.isArray(fullRawState.pendingRegistrations)) fullRawState.pendingRegistrations = [];
+  fullRawState.pendingRegistrations.push(registration);
+  const result = await saveParentData();
+  if(!result.ok){
+    console.error('Registration save failed', result.error);
+    return false;
+  }
+  state.pendingRegistrations = fullRawState.pendingRegistrations;
+  return true;
+}
+
+// ---------- Remembered-device PIN-only login ----------
+// Once a student's parent has set a PIN, we remember them on this device so
+// they don't need to re-enter the phone number every time — just the PIN.
+(function initRememberedLogin(){
+  let rememberedId = null;
+  try{ rememberedId = localStorage.getItem('rememberedStudentId'); }catch(e){}
+  if(rememberedId){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('pinOnlyScreen').style.display = 'block';
+  }
+})();
+
+document.getElementById('pinOnlySwitchLink').addEventListener('click', ()=>{
+  try{ localStorage.removeItem('rememberedStudentId'); }catch(e){}
+  document.getElementById('pinOnlyScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'block';
+});
+
+document.getElementById('pinOnlyInput').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') document.getElementById('pinOnlyLoginBtn').click();
+});
+
+document.getElementById('pinOnlyLoginBtn').addEventListener('click', async ()=>{
+  const errorEl = document.getElementById('pinOnlyError');
+  const loadingEl = document.getElementById('pinOnlyLoading');
+  errorEl.textContent = '';
+  const enteredPin = document.getElementById('pinOnlyInput').value.trim();
+  if(!/^\d{4}$/.test(enteredPin)){
+    errorEl.textContent = '4-digit PIN daalein.';
+    return;
+  }
+  let rememberedId = null;
+  try{ rememberedId = localStorage.getItem('rememberedStudentId'); }catch(e){}
+  if(!rememberedId){
+    document.getElementById('pinOnlyScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'block';
+    return;
+  }
+  loadingEl.style.display = 'block';
+  try{
+    await loadData();
+  }catch(e){
+    loadingEl.style.display = 'none';
+    errorEl.textContent = 'Internet check karke dobara koshish karein.';
+    return;
+  }
+  loadingEl.style.display = 'none';
+  const student = state.students.find(s => s.id === rememberedId);
+  if(!student){
+    // This student record no longer exists on this device's remembered
+    // account — fall back to normal phone login instead of getting stuck.
+    try{ localStorage.removeItem('rememberedStudentId'); }catch(e){}
+    document.getElementById('pinOnlyScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'block';
+    return;
+  }
+  if(student.pin !== enteredPin){
+    errorEl.textContent = t('incorrect_pin');
+    return;
+  }
+  document.getElementById('pinOnlyInput').value = '';
+  // Same phone number may belong to more than one child (siblings) — make
+  // sure the "Switch Child" option still works after a remembered-PIN
+  // login, not just after a fresh phone-number login.
+  const studentPhone = cleanPhone(student.phone);
+  matchedStudents = studentPhone
+    ? state.students.filter(s => cleanPhone(s.phone) === studentPhone)
+    : [student];
+  showDashboard(student);
+});
+
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const input = document.getElementById('phoneInput');
+  const errorEl = document.getElementById('loginError');
+  const loadingEl = document.getElementById('loginLoading');
+  errorEl.textContent = '';
+  const digits = input.value.replace(/[^0-9]/g,'');
+  if(digits.length !== 10){
+    errorEl.textContent = t('invalid_phone');
+    return;
+  }
+  loadingEl.style.display = 'block';
+  try{
+    await loadData();
+  }catch(e){
+    console.error('Login failed:', e);
+    loadingEl.style.display = 'none';
+    errorEl.textContent = 'Could not connect (' + (e && e.message ? e.message : 'unknown error') + ') — please try again.';
+    return;
+  }
+  loadingEl.style.display = 'none';
+
+  matchedStudents = state.students.filter(s => cleanPhone(s.phone) === digits);
+  if(matchedStudents.length === 0){
+    const isPending = (state.pendingRegistrations||[]).some(r => cleanPhone(r.phone) === digits && r.status === 'pending');
+    errorEl.textContent = isPending ? t('registration_pending_note') : t('no_student_found');
+    return;
+  }
+
+  // PIN is optional: only students who have set one need to enter it correctly.
+  // Anyone who hasn't set a PIN yet can still log in with just their phone number.
+  const enteredPin = document.getElementById('pinInput').value.trim();
+  const studentsNeedingPin = matchedStudents.filter(s => s.pin);
+  if(studentsNeedingPin.length){
+    const pinMatched = studentsNeedingPin.filter(s => s.pin === enteredPin);
+    if(pinMatched.length === 0){
+      errorEl.textContent = t('incorrect_pin');
+      return;
+    }
+    // Only show the records whose PIN actually matched, plus any siblings that never set a PIN.
+    matchedStudents = matchedStudents.filter(s => !s.pin || s.pin === enteredPin);
+  }
+
+  if(matchedStudents.length === 1){
+    showDashboard(matchedStudents[0]);
+  } else {
+    showPicker(matchedStudents);
+  }
+});
+
+document.getElementById('pinInput').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+
+document.getElementById('phoneInput').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+
+function showPicker(students){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('pickerScreen').style.display = 'block';
+  document.getElementById('pickerList').innerHTML = students.map((s,i)=>`
+    <div class="picker-card" data-idx="${i}">
+      ${s.photo
+        ? `<img src="${s.photo}" class="picker-avatar">`
+        : `<div class="picker-avatar-placeholder">${(s.name||'?').charAt(0).toUpperCase()}</div>`}
+      <div>
+        <div class="picker-name">${s.name}</div>
+        <div class="picker-meta">${schoolName(s.schoolId)}${s.class ? ' · Class '+s.class : ''}</div>
+      </div>
+    </div>
+  `).join('');
+  document.querySelectorAll('.picker-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      showDashboard(students[Number(card.dataset.idx)]);
+    });
+  });
+}
+
+let currentStudent = null;
+
+function resizeImageFile(file, maxSize){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w > h && w > maxSize){ h = Math.round(h * maxSize / w); w = maxSize; }
+        else if(h > maxSize){ w = Math.round(w * maxSize / h); h = maxSize; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function showDashboard(student){
+  currentStudent = student;
+  if(student.pin){
+    try{ localStorage.setItem('rememberedStudentId', student.id); }catch(e){}
+  }
+  const policyUpdatedAt = (state.policy && state.policy.updatedAt) || '';
+  const alreadyAccepted = policyUpdatedAt && student.policyAcceptedAt === policyUpdatedAt;
+  if(policyUpdatedAt && !alreadyAccepted){
+    showPolicyAcceptScreen(student);
+  } else {
+    renderDashboardUI(student);
+  }
+}
+
+function showPolicyAcceptScreen(student){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('pickerScreen').style.display = 'none';
+  document.getElementById('pinOnlyScreen').style.display = 'none';
+  document.getElementById('dashScreen').style.display = 'none';
+  document.getElementById('policyAcceptText').textContent = (state.policy && state.policy.text) || t('no_policy');
+  document.getElementById('policyAcceptCheckbox').checked = false;
+  document.getElementById('policyAcceptContinueBtn').disabled = true;
+  document.getElementById('policyAcceptContinueBtn').style.opacity = '0.5';
+  document.getElementById('policyAcceptStatus').textContent = '';
+  document.getElementById('policyAcceptScreen').style.display = 'block';
+}
+
+function renderDashboardUI(student){
+  currentStudent = student;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('pickerScreen').style.display = 'none';
+  document.getElementById('pinOnlyScreen').style.display = 'none';
+  document.getElementById('policyAcceptScreen').style.display = 'none';
+  document.getElementById('dashScreen').style.display = 'block';
+  document.getElementById('syncWarning').style.display = hasPendingSave('data') ? 'flex' : 'none';
+  renderLeaveStatus(student);
+
+  // Same-phone siblings — always show a quick way to switch, not just via
+  // full logout, since a remembered-PIN login only knows one child by
+  // default (fixed by populating matchedStudents on that path too).
+  const switchBtn = document.getElementById('switchChildBtn');
+  switchBtn.style.display = (matchedStudents && matchedStudents.length > 1) ? 'flex' : 'none';
+
+  document.getElementById('pinBtnLabel').textContent = student.pin ? t('change_my_pin') : t('set_my_pin');
+
+  // First time logging in with just a phone number? Prompt them to set a PIN
+  // right away, so next time their fee details are protected by more than
+  // just a guessable phone number.
+  if(!student.pin){
+    setTimeout(()=> openPinModal(true), 400);
+  }
+
+  if(student.photo){
+    document.getElementById('studentPhoto').src = student.photo;
+    document.getElementById('studentPhoto').style.display = 'block';
+    document.getElementById('studentPhotoPlaceholder').style.display = 'none';
+  } else {
+    document.getElementById('studentPhoto').style.display = 'none';
+    document.getElementById('studentPhotoPlaceholder').style.display = 'flex';
+  }
+  document.getElementById('studentName').textContent = student.name;
+  document.getElementById('studentSub').textContent =
+    [schoolName(student.schoolId), student.class ? 'Class '+student.class : '', vehicleName(student.vehicleId)].filter(Boolean).join(' · ');
+  const srNo = state.students.findIndex(s => s.id === student.id) + 1;
+  document.getElementById('studentIdChip').textContent = '#' + (srNo || 1);
+  document.getElementById('studentFeeAmt').textContent = '₹' + (student.fee || 0);
+
+  const assignedDriver = driverForVehicle(student.vehicleId);
+
+  // Shows a banner if the assigned driver reported a delay recently (within
+  // the last 3 hours) for this student's vehicle — same data the admin sees.
+  const delayBanner = document.getElementById('delayAlertBanner');
+  const recentDelay = (state.delayUpdates || [])
+    .filter(u => u.vehicleId && student.vehicleId && (u.vehicleId === student.vehicleId))
+    .filter(u => (Date.now() - new Date(u.createdAt).getTime()) < 3*60*60*1000)
+    .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+  if(recentDelay){
+    document.getElementById('delayAlertText').textContent =
+      `${recentDelay.reason} — ${recentDelay.driverName || 'Driver'} ne bataya, ${timeAgoParent(recentDelay.createdAt)}`;
+    delayBanner.style.display = 'flex';
+  } else {
+    delayBanner.style.display = 'none';
+  }
+
+  document.getElementById('studentInfoRows').innerHTML = [
+    student.schoolId ? `<div class="student-info-row"><span class="si-label">School</span><span class="si-value">${schoolName(student.schoolId)}</span></div>` : '',
+    student.parent ? `<div class="student-info-row"><span class="si-label">Parent</span><span class="si-value">${student.parent}</span></div>` : '',
+    student.phone ? `<div class="student-info-row"><span class="si-label">Phone</span><span class="si-value">${student.phone}</span></div>` : '',
+    student.village ? `<div class="student-info-row"><span class="si-label">Village</span><span class="si-value">${student.village}</span></div>` : '',
+    assignedDriver ? `<div class="student-info-row"><span class="si-label">Driver</span><span class="si-value">${assignedDriver.name}${assignedDriver.phone ? ' — <a href="tel:'+assignedDriver.phone+'" style="color:var(--ink-dark);">'+assignedDriver.phone+'</a>' : ''}</span></div>` : ''
+  ].filter(Boolean).join('');
+
+  // Live location — only shows up while the driver has sharing on (company
+  // policy: 6 AM–6 PM). Same Google Maps link the office uses.
+  const liveLocBtn = document.getElementById('liveLocationBtn');
+  const loc = assignedDriver ? (state.liveLocations || {})[assignedDriver.id] : null;
+  if(loc){
+    document.getElementById('liveLocationBtnLabel').textContent = `📍 View Van's Live Location (${timeAgoParent(loc.updatedAt)})`;
+    liveLocBtn.href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
+    liveLocBtn.style.display = 'flex';
+  } else {
+    liveLocBtn.style.display = 'none';
+  }
+
+  // Van Timing button — only shows if a route has been fixed for this
+  // student's vehicle.
+  const timingBtn = document.getElementById('openVanTimingBtn');
+  const myRoutes = routesForVehicle(student.vehicleId);
+  timingBtn.style.display = myRoutes.length > 0 ? 'flex' : 'none';
+
+  // "My Suggestions/Complaints" button — only shows once this student has
+  // submitted at least one, and flags if any have an unread admin reply.
+  const myFeedbackBtn = document.getElementById('openMyFeedbackBtn');
+  const myFeedbackList = (state.parentFeedback || []).filter(f => f.studentId === student.id);
+  if(myFeedbackList.length > 0){
+    const repliedCount = myFeedbackList.filter(f => f.reply).length;
+    document.getElementById('myFeedbackBtnLabel').textContent =
+      repliedCount > 0 ? `My Suggestions/Complaints (${repliedCount} replied)` : 'My Suggestions/Complaints';
+    myFeedbackBtn.style.display = 'flex';
+  } else {
+    myFeedbackBtn.style.display = 'none';
+  }
+
+  const waMsg = encodeURIComponent(t('whatsapp_msg')(student.name));
+  document.getElementById('whatsappBtn').href = `https://wa.me/918103026611?text=${waMsg}`;
+
+  let totalDue = 0;
+  const tbody = document.getElementById('monthTableBody');
+  tbody.innerHTML = MONTH_KEYS.map((mk, i)=>{
+    const status = feeStatus(student, mk);
+    const paidAmt = paidAmountFor(student.id, mk);
+    const dueAmt = dueAmountForMonth(student, mk);
+    const lateFee = lateFeeFor(student, mk);
+    const payDate = paidDateFor(student.id, mk);
+    const payRecordedAt = paidRecordedAtFor(student.id, mk);
+    if(status === 'due' || status === 'partial') totalDue += dueAmt;
+    const statusLabel = status === 'paid' ? t('status_paid') : status === 'partial' ? t('status_partial') : status === 'due' ? t('status_due') : t('status_upcoming');
+    const dt = payDate ? formatDateDayTime(payDate, payRecordedAt) : null;
+
+    // Pay button shows the TOTAL of every unpaid month up to and including this
+    // one (not just this single month) — so an August payment automatically
+    // includes any earlier pending months like July, per the no-skip fee policy.
+    // Also shown on "Not Yet Due" months so parents can pay in advance if they want to.
+    let cumulativeDue = 0;
+    let pendingMonthLabels = [];
+    if(status !== 'paid'){
+      for(let j = 0; j <= i; j++){
+        const jStatus = feeStatus(student, MONTH_KEYS[j]);
+        const jDue = dueAmountForMonth(student, MONTH_KEYS[j]);
+        const includeThis = (jStatus === 'due' || jStatus === 'partial') || (j === i && jStatus === 'upcoming');
+        if(includeThis && jDue > 0){
+          cumulativeDue += jDue;
+          pendingMonthLabels.push(MONTHS[j] + ' ' + yearForMonth(MONTH_KEYS[j]));
+        }
+      }
+    }
+    const payBtn = (cumulativeDue > 0)
+      ? `<button type="button" class="mt-pay-btn${status==='upcoming' ? ' advance' : ''}" onclick="payForMonth('${pendingMonthLabels.join(', ')}', ${cumulativeDue})">${status==='upcoming' ? t('pay_advance_btn') : t('pay_btn')}</button>`
+      : '';
+
+    return `
+    <tr>
+      <td><b>${MONTHS[i]}</b> ${yearForMonth(mk)}</td>
+      <td><span class="mt-status ${status}">${statusLabel}</span></td>
+      <td class="mt-amount paid-col">${paidAmt > 0 ? '₹'+paidAmt : '—'}</td>
+      <td class="mt-amount due-col">${dueAmt > 0 ? '₹'+dueAmt : '—'}${lateFee > 0 ? `<span class="late-fee-note">+₹${lateFee} late fee</span>` : ''}</td>
+      <td class="mt-date">${dt ? dt.line1 : '—'}${dt && dt.line2 ? `<span class="payment-time">${dt.line2}</span>` : ''}</td>
+      <td>${payBtn}</td>
+    </tr>`;
+  }).join('');
+
+  const dueBanner = document.getElementById('dueBanner');
+  const dueIcon = document.getElementById('dueIcon');
+  document.getElementById('dueAmount').textContent = '₹' + totalDue;
+  if(totalDue > 0){
+    dueBanner.classList.remove('clear');
+    dueIcon.style.color = 'var(--due)';
+    dueIcon.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+  } else {
+    dueBanner.classList.add('clear');
+    dueIcon.style.color = 'var(--paid)';
+    dueIcon.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+  }
+
+  renderBills(student);
+  renderParentAnnouncements();
+
+  const pendingBills = state.invoices.filter(inv => inv.receiptType === 'fee' && inv.feeStudentId === student.id && inv.balanceDue > 0).length;
+  const billsBadge = document.getElementById('billsBadge');
+  if(pendingBills > 0){ billsBadge.textContent = pendingBills; billsBadge.style.display = 'block'; }
+  else { billsBadge.style.display = 'none'; }
+
+  const announceCount = (state.announcements || []).length;
+  const announceBadge = document.getElementById('announceBadge');
+  if(announceCount > 0){ announceBadge.textContent = announceCount; announceBadge.style.display = 'block'; }
+  else { announceBadge.style.display = 'none'; }
+}
+
+function payForMonth(monthLabels, amount){
+  const months = monthLabels.split(', ');
+  document.getElementById('payInfoMonths').textContent = months.length > 1 ? months.join(' + ') : monthLabels;
+  document.getElementById('payInfoAmount').textContent = '₹' + amount;
+  document.getElementById('payInfoNote').textContent = months.length > 1
+    ? t('pay_note_multi')
+    : '';
+  document.getElementById('payInfoOverlay').style.display = 'flex';
+}
+
+function renderParentAnnouncements(){
+  const list = (state.announcements || []).slice().sort((a,b) => (a.date < b.date ? 1 : -1));
+  const el = document.getElementById('parentAnnouncementsList');
+  if(list.length === 0){
+    el.innerHTML = `<div class="pa-empty">${t('no_announcements')}</div>`;
+    return;
+  }
+  el.innerHTML = list.map(a => `
+    <div class="pa-item">
+      <div class="pa-item-text">${a.text}</div>
+      <div class="pa-item-date">${new Date(a.date).toLocaleDateString('en-IN', { weekday:'short', day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
+    </div>
+  `).join('');
+}
+
+function renderBills(student){
+  const bills = state.invoices
+    .filter(inv => inv.receiptType === 'fee' && inv.feeStudentId === student.id)
+    .sort((a,b) => (a.date < b.date ? 1 : -1));
+  const listEl = document.getElementById('billsList');
+  if(bills.length === 0){
+    listEl.innerHTML = `<div class="empty-note">${t('no_bills')}</div>`;
+    return;
+  }
+  listEl.innerHTML = bills.map((inv, idx) => `
+    <div class="bill-card">
+      <div class="bill-icon">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <div>
+        <div class="bill-no">${inv.invoiceNo || 'Bill'}</div>
+        <div class="bill-meta">${formatDate(inv.date)}</div>
+        <button type="button" class="bill-view-btn" data-idx="${idx}">${t('view')}</button>
+      </div>
+      <div class="bill-amt">₹${inv.grandTotal||0}${inv.balanceDue > 0 ? `<br><span style="color:var(--due);font-size:0.68rem;">₹${inv.balanceDue} due</span>` : ''}</div>
+    </div>
+  `).join('');
+  listEl.querySelectorAll('.bill-view-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> showBillDetail(bills[Number(btn.dataset.idx)]));
+  });
+}
+
+function showBillDetail(inv){
+  currentBillForPdf = inv;
+  const itemsHtml = (inv.items||[]).map(it => `
+    <tr>
+      <td style="padding:6px 0;">${it.description}</td>
+      <td style="padding:6px 0;text-align:right;font-family:'JetBrains Mono',monospace;">₹${it.rate}</td>
+    </tr>`).join('');
+  document.getElementById('billViewContent').innerHTML = `
+    <div style="text-align:center;margin-bottom:14px;">
+      <div style="font-family:'Bitter',serif;font-weight:800;font-size:1.1rem;color:var(--ink-dark);">${inv.invoiceNo || 'Bill'}</div>
+      <div style="font-size:0.76rem;color:var(--muted);margin-top:2px;">${formatDate(inv.date)}</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;border-top:1px solid var(--paper-line);border-bottom:1px solid var(--paper-line);margin-bottom:12px;">
+      ${itemsHtml}
+    </table>
+    <div style="display:flex;justify-content:space-between;font-weight:700;font-size:0.95rem;color:var(--ink-dark);">
+      <span>Total</span><span style="font-family:'JetBrains Mono',monospace;">₹${inv.grandTotal||0}</span>
+    </div>
+    ${inv.balanceDue > 0 ? `<div style="display:flex;justify-content:space-between;color:var(--due);font-weight:700;margin-top:6px;font-size:0.85rem;"><span>Balance Due</span><span>₹${inv.balanceDue}</span></div>` : ''}
+  `;
+  document.getElementById('billViewOverlay').style.display = 'flex';
+}
+document.getElementById('openVanTimingBtn').addEventListener('click', ()=>{
+  if(!currentStudent) return;
+  const myRoutes = routesForVehicle(currentStudent.vehicleId);
+  const villageLower = (currentStudent.village || '').trim().toLowerCase();
+  const container = document.getElementById('vanTimingContent');
+  if(myRoutes.length === 0){
+    container.innerHTML = '<div class="empty-note">Abhi koi route fix nahi hai.</div>';
+  } else {
+    container.innerHTML = myRoutes.map(route => `
+      <div style="margin-bottom:14px;">
+        <div style="font-weight:700;color:var(--ink-dark);font-family:'Bitter',serif;margin-bottom:6px;">${route.name || 'Route'}</div>
+        ${(route.stops||[]).map((s, i) => {
+          const isMine = villageLower && s.name.toLowerCase().includes(villageLower);
+          return `
+          <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;margin-bottom:4px;${isMine ? 'background:var(--brass-light);font-weight:700;' : ''}">
+            <span>${i+1}. ${s.name}</span>
+            <span style="font-family:'JetBrains Mono',monospace;">${s.time ? formatTime12h(s.time) : '—'}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    `).join('');
+  }
+  document.getElementById('vanTimingOverlay').style.display = 'flex';
+});
+
+document.getElementById('closeBillViewBtn').addEventListener('click', ()=>{
+  document.getElementById('billViewOverlay').style.display = 'none';
+});
+
+document.getElementById('downloadBillPdfBtn').addEventListener('click', ()=>{
+  const inv = currentBillForPdf;
+  if(!inv || !window.jspdf) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const marginX = 48;
+  let y = 56;
+
+  // Header
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor(15, 42, 90); // ink-dark
+  doc.text('DAXON MOBILITY', pageW/2, y, { align: 'center' });
+  y += 18;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(107, 114, 128);
+  doc.text('Barman, Barman College ke samne, Government Hospital Road, Pin 487330, M.P.', pageW/2, y, { align: 'center' });
+  y += 13;
+  doc.text('Reg No: UDYAM-MP-32-0014395  ·  GSTIN: 23BORPR8040F1ZP', pageW/2, y, { align: 'center' });
+  y += 10;
+  doc.setDrawColor(212, 175, 55); // brass
+  doc.setLineWidth(1.2);
+  doc.line(marginX, y, pageW - marginX, y);
+  y += 26;
+
+  // Receipt title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(15, 42, 90);
+  doc.text('FEE RECEIPT', marginX, y);
+  doc.setFontSize(10);
+  doc.setTextColor(60,60,60);
+  doc.text(inv.invoiceNo || '', pageW - marginX, y, { align: 'right' });
+  y += 16;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(107, 114, 128);
+  doc.text(`Date: ${formatDate(inv.date)}`, marginX, y);
+  if(inv.customerName){
+    doc.text(`Student: ${inv.customerName}`, pageW - marginX, y, { align: 'right' });
+  }
+  y += 24;
+
+  // Items table header
+  doc.setFillColor(251, 249, 244); // paper
+  doc.rect(marginX, y-12, pageW - marginX*2, 20, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9.5);
+  doc.setTextColor(168, 121, 28); // brass-deep
+  doc.text('DESCRIPTION', marginX+6, y+2);
+  doc.text('AMOUNT', pageW - marginX - 6, y+2, { align: 'right' });
+  y += 20;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(43, 46, 51);
+  (inv.items || []).forEach(it => {
+    doc.text(String(it.description || ''), marginX+6, y);
+    doc.text(`Rs ${it.rate || 0}`, pageW - marginX - 6, y, { align: 'right' });
+    y += 18;
+  });
+
+  y += 6;
+  doc.setDrawColor(231, 225, 211);
+  doc.setLineWidth(0.7);
+  doc.line(marginX, y, pageW - marginX, y);
+  y += 22;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(15, 42, 90);
+  doc.text('Total', marginX, y);
+  doc.text(`Rs ${inv.grandTotal || 0}`, pageW - marginX, y, { align: 'right' });
+
+  if(inv.balanceDue > 0){
+    y += 20;
+    doc.setTextColor(178, 59, 49); // due
+    doc.text('Balance Due', marginX, y);
+    doc.text(`Rs ${inv.balanceDue}`, pageW - marginX, y, { align: 'right' });
+  }
+
+  y += 50;
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(9);
+  doc.setTextColor(107, 114, 128);
+  doc.text('Thank you for choosing DAXON MOBILITY.', pageW/2, y, { align: 'center' });
+
+  doc.save(`Receipt-${(inv.invoiceNo||'bill').replace(/[^A-Za-z0-9-]/g,'')}.pdf`);
+});
+
+
+document.getElementById('openFeeStatusBtn').addEventListener('click', ()=>{
+  document.getElementById('feeStatusOverlay').style.display = 'flex';
+});
+document.getElementById('openBillsBtn').addEventListener('click', ()=>{
+  document.getElementById('billsOverlay').style.display = 'flex';
+});
+document.getElementById('openAnnouncementsBtn').addEventListener('click', ()=>{
+  document.getElementById('announcementsOverlay').style.display = 'flex';
+  document.getElementById('announceBadge').style.display = 'none';
+});
+document.getElementById('openPolicyBtn').addEventListener('click', ()=>{
+  document.getElementById('policyContent').textContent = (state.policy && state.policy.text) || t('no_policy');
+  document.getElementById('policyOverlay').style.display = 'flex';
+});
+
+document.getElementById('openRegisterLink').addEventListener('click', async ()=>{
+  if(!fullRawState){
+    try{ await loadData(); }catch(e){ console.error('Could not load data for registration form:', e); }
+  }
+  const schoolSel = document.getElementById('regSchool');
+  schoolSel.innerHTML = '<option value="">— Select School —</option>' +
+    state.schools.map(sc => `<option value="${sc.id}">${sc.name}</option>`).join('');
+  document.getElementById('registerForm').reset();
+  document.getElementById('regStatusMsg').textContent = '';
+  document.getElementById('registerOverlay').style.display = 'flex';
+});
+
+document.getElementById('registerForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const statusEl = document.getElementById('regStatusMsg');
+  const submitBtn = document.getElementById('submitRegisterBtn');
+  statusEl.textContent = '';
+
+  const name = document.getElementById('regName').value.trim();
+  const parent = document.getElementById('regParent').value.trim();
+  const phoneDigits = document.getElementById('regPhone').value.replace(/[^0-9]/g,'');
+
+  if(!name){ statusEl.style.color='var(--due)'; statusEl.textContent = t('register_name_required'); return; }
+  if(!parent){ statusEl.style.color='var(--due)'; statusEl.textContent = t('register_parent_required'); return; }
+  if(phoneDigits.length !== 10){ statusEl.style.color='var(--due)'; statusEl.textContent = t('register_phone_required'); return; }
+
+  const registration = {
+    id: 'reg_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    name,
+    class: document.getElementById('regClass').value.trim(),
+    schoolId: document.getElementById('regSchool').value,
+    parent,
+    phone: phoneDigits,
+    village: document.getElementById('regVillage').value.trim(),
+    submittedAt: new Date().toISOString(),
+    status: 'pending'
+  };
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = t('register_submitting');
+  const ok = await submitRegistration(registration);
+  submitBtn.disabled = false;
+  submitBtn.textContent = t('submit_registration');
+
+  if(ok){
+    statusEl.style.color = 'var(--paid)';
+    statusEl.textContent = t('register_success');
+    setTimeout(()=>{ document.getElementById('registerOverlay').style.display = 'none'; }, 2200);
+  } else {
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = t('register_error');
+  }
+});
+
+document.getElementById('openEditInfoBtn').addEventListener('click', ()=>{
+  if(!currentStudent) return;
+  const s = currentStudent;
+
+  const schoolSel = document.getElementById('eiSchool');
+  schoolSel.innerHTML = '<option value="">— Select School —</option>' +
+    state.schools.map(sc => `<option value="${sc.id}" ${sc.id===s.schoolId?'selected':''}>${sc.name}</option>`).join('');
+
+  const vehicleSel = document.getElementById('eiVehicle');
+  vehicleSel.innerHTML = '<option value="">— Select Vehicle —</option>' +
+    state.vehicles.map(v => `<option value="${v.name}" ${v.name===s.vehicleId?'selected':''}>${v.name}</option>`).join('');
+
+  document.getElementById('eiName').value = s.name || '';
+  document.getElementById('eiClass').value = s.class || '';
+  document.getElementById('eiParent').value = s.parent || '';
+  document.getElementById('eiPhone').value = s.phone || '';
+  document.getElementById('eiVillage').value = s.village || '';
+  document.getElementById('eiPhotoData').value = s.photo || '';
+
+  if(s.photo){
+    document.getElementById('eiPhotoPreview').src = s.photo;
+    document.getElementById('eiPhotoPreview').style.display = 'block';
+    document.getElementById('eiPhotoPlaceholder').style.display = 'none';
+  } else {
+    document.getElementById('eiPhotoPreview').style.display = 'none';
+    document.getElementById('eiPhotoPlaceholder').style.display = 'flex';
+  }
+  document.getElementById('eiStatusMsg').textContent = '';
+  document.getElementById('editInfoOverlay').style.display = 'flex';
+});
+
+function openPinModal(isFirstTime){
+  if(!currentStudent) return;
+  const hasPin = !!currentStudent.pin;
+  document.getElementById('pinModalTitle').textContent = isFirstTime ? t('set_my_pin') : (hasPin ? t('change_my_pin') : t('set_my_pin'));
+  document.getElementById('pinCurrentField').style.display = hasPin ? 'block' : 'none';
+  document.getElementById('pinCurrentInput').value = '';
+  document.getElementById('pinNewInput').value = '';
+  document.getElementById('pinConfirmInput').value = '';
+  document.getElementById('pinStatusMsg').textContent = '';
+  document.getElementById('pinSkipBtn').style.display = isFirstTime ? 'block' : 'none';
+  document.getElementById('pinCloseBtn').style.display = isFirstTime ? 'none' : 'block';
+  document.getElementById('pinOverlay').style.display = 'flex';
+}
+
+document.getElementById('openPinBtn').addEventListener('click', ()=> openPinModal(false));
+
+document.getElementById('pinSkipBtn').addEventListener('click', ()=>{
+  document.getElementById('pinOverlay').style.display = 'none';
+});
+
+document.getElementById('savePinBtn').addEventListener('click', async ()=>{
+  if(!currentStudent) return;
+  const statusEl = document.getElementById('pinStatusMsg');
+  const saveBtn = document.getElementById('savePinBtn');
+  statusEl.textContent = '';
+
+  const hasPin = !!currentStudent.pin;
+  const currentEntered = document.getElementById('pinCurrentInput').value.trim();
+  const newPin = document.getElementById('pinNewInput').value.trim();
+  const confirmPin = document.getElementById('pinConfirmInput').value.trim();
+
+  if(hasPin && currentEntered !== currentStudent.pin){
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = t('pin_wrong_current');
+    return;
+  }
+  if(!/^\d{4}$/.test(newPin)){
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = t('pin_must_be_4_digits');
+    return;
+  }
+  if(newPin !== confirmPin){
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = t('pin_mismatch');
+    return;
+  }
+
+  saveBtn.disabled = true;
+  const ok = await saveStudentEdit({ id: currentStudent.id, pin: newPin });
+  saveBtn.disabled = false;
+
+  if(ok){
+    currentStudent = { ...currentStudent, pin: newPin };
+    try{ localStorage.setItem('rememberedStudentId', currentStudent.id); }catch(e){}
+    document.getElementById('pinBtnLabel').textContent = t('change_my_pin');
+    statusEl.style.color = 'var(--paid)';
+    statusEl.textContent = t('pin_saved');
+    setTimeout(()=>{ document.getElementById('pinOverlay').style.display = 'none'; }, 900);
+  } else {
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = t('save_error');
+  }
+});
+
+document.getElementById('eiPhotoFile').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  if(file.size > 5*1024*1024){ document.getElementById('eiStatusMsg').textContent = t('photo_size_error'); return; }
+  try{
+    const dataUrl = await resizeImageFile(file, 500);
+    document.getElementById('eiPhotoData').value = dataUrl;
+    document.getElementById('eiPhotoPreview').src = dataUrl;
+    document.getElementById('eiPhotoPreview').style.display = 'block';
+    document.getElementById('eiPhotoPlaceholder').style.display = 'none';
+  }catch(err){
+    console.error(err);
+    document.getElementById('eiStatusMsg').textContent = t('photo_load_error');
+  }
+});
+
+document.getElementById('editInfoForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const statusEl = document.getElementById('eiStatusMsg');
+  const saveBtn = document.getElementById('eiSaveBtn');
+  const name = document.getElementById('eiName').value.trim();
+  if(!name){ statusEl.textContent = t('name_required'); statusEl.style.color = 'var(--due)'; return; }
+
+  saveBtn.disabled = true;
+  saveBtn.textContent = t('saving');
+  statusEl.textContent = '';
+
+  const updated = {
+    ...currentStudent,
+    name,
+    class: document.getElementById('eiClass').value.trim(),
+    schoolId: document.getElementById('eiSchool').value,
+    vehicleId: document.getElementById('eiVehicle').value,
+    parent: document.getElementById('eiParent').value.trim(),
+    phone: document.getElementById('eiPhone').value.trim(),
+    village: document.getElementById('eiVillage').value.trim(),
+    photo: document.getElementById('eiPhotoData').value
+  };
+
+  const ok = await saveStudentEdit(updated);
+  saveBtn.disabled = false;
+  saveBtn.textContent = t('save_changes');
+
+  if(ok){
+    currentStudent = updated;
+    showDashboard(updated);
+    statusEl.style.color = 'var(--paid)';
+    statusEl.textContent = t('saved_success');
+    setTimeout(()=>{ document.getElementById('editInfoOverlay').style.display = 'none'; }, 900);
+  } else {
+    statusEl.style.color = 'var(--due)';
+    statusEl.textContent = t('save_error');
+  }
+});
+
+document.querySelectorAll('[data-close]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.getElementById(btn.dataset.close).style.display = 'none';
+  });
+});
+
+document.getElementById('switchChildBtn').addEventListener('click', ()=>{
+  if(!matchedStudents || matchedStudents.length < 2) return;
+  document.getElementById('dashScreen').style.display = 'none';
+  showPicker(matchedStudents);
+});
+
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  document.getElementById('dashScreen').style.display = 'none';
+  let rememberedId = null;
+  try{ rememberedId = localStorage.getItem('rememberedStudentId'); }catch(e){}
+  if(rememberedId){
+    document.getElementById('pinOnlyInput').value = '';
+    document.getElementById('pinOnlyError').textContent = '';
+    document.getElementById('pinOnlyScreen').style.display = 'block';
+  } else if(matchedStudents.length > 1){
+    document.getElementById('pickerScreen').style.display = 'block';
+  } else {
+    document.getElementById('loginScreen').style.display = 'block';
+    document.getElementById('phoneInput').value = '';
+  }
+});
+
+// ---------- Install App (Add to Home Screen) ----------
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(e=>console.log('Service worker registration failed:', e));
+}
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('installBtn').style.display = 'flex';
+});
+window.addEventListener('appinstalled', ()=>{
+  document.getElementById('installBtn').style.display = 'none';
+});
+// Show the button anyway on browsers that never fire beforeinstallprompt (e.g. iOS Safari).
+const isStandaloneParent = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+if(!isStandaloneParent){
+  setTimeout(()=>{
+    if(document.getElementById('installBtn').style.display === 'none'){
+      document.getElementById('installBtn').style.display = 'flex';
+    }
+  }, 800);
+}
+document.getElementById('installBtn').addEventListener('click', async ()=>{
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+  } else {
+    document.getElementById('installOverlay').style.display = 'flex';
+  }
+});
+</script>
+</body>
+</html>
